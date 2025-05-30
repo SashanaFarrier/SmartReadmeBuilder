@@ -1,0 +1,72 @@
+﻿@using SmartReadmeBuilder.Models
+@model NoteViewModel;
+
+@{
+    ViewData["Title"] = "Markdowns";
+}
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<div class="container-fluid">
+    <h1 class="display-4">Markdown Logs</h1>
+    @* <h2>Manage your Prompts.</h2> *@
+        <div class="mt-3">
+            <div class="d-flex justify-content-between">
+            @if (ViewBag.Notes != null)
+            {
+                <div class="prompt-history col-4">
+                    <h3>Prompt history</h3>
+                    <ul class="list-group">
+                        @foreach (var note in (List<Note>)ViewBag.Notes)
+                        {
+                            <li class="list-group-item">
+                                <div class="note-content">
+                                    <p>@note.Text</p>
+                                    <span class="note-timestamp">@note.CreatedOn.ToString("g")</span>
+                                </div>
+                                <form asp-controller="Markdown" asp-action="GenerateMarkdownFromPreviousPrompt">
+                                    <input type="hidden" name="Id" value="@note.Id" />
+                                    <button class="btn btn-secondary btn-sm">Regenerate markdown</button>
+                                </form>
+
+                                <form asp-controller="Notes" asp-action="UpdateMarkdownPrompt" method="post" class="float-end">
+                                    <input type="hidden" name="id" value="@note.Id" />
+                                    <button type="submit" class="btn btn-secondary btn-sm">Edit</button>
+                                </form>
+                                <form asp-controller="Notes" asp-action="DeleteNote" method="post" class="float-end">
+                                    <input type="hidden" name="id" value="@note.Id" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <div class="readmes col-7">
+                    <h3>Markdowns:</h3>
+                    <ul class="list-group">
+                        @foreach (var note in (List<Note>)ViewBag.Notes)
+                        {
+                            <li class="list-group-item">
+                                <div class="note-content">
+                                    <pre>@note.MarkdownText</pre>
+                                    @* <span class="note-timestamp">@note.CreatedOn.ToString("g")</span> *@
+                                </div>
+                                <button class="btn btn-secondary btn-sm">Generate markdown</button>
+                                @* <form asp-action="DeleteNote" method="post" class="float-end">
+                        <input type="hidden" name="id" value="@note.Id" />
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form> *@
+                            </li>
+                        }
+                    </ul>
+                </div>
+               
+            }
+            </div>
+           
+        </div> 
+</div>
