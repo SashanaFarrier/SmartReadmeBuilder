@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36109.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartReadmeBuilder", "Character-counter\SmartReadmeBuilder.csproj", "{C2A7FBEF-50CF-4EE3-8C77-310E3032E496}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartReadmeBuilder", "smart-readme-builder\SmartReadmeBuilder.csproj", "{4FBE6A12-D897-4450-0D5F-F6DFB6AFB1FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C2A7FBEF-50CF-4EE3-8C77-310E3032E496}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C2A7FBEF-50CF-4EE3-8C77-310E3032E496}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C2A7FBEF-50CF-4EE3-8C77-310E3032E496}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C2A7FBEF-50CF-4EE3-8C77-310E3032E496}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FBE6A12-D897-4450-0D5F-F6DFB6AFB1FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FBE6A12-D897-4450-0D5F-F6DFB6AFB1FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FBE6A12-D897-4450-0D5F-F6DFB6AFB1FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FBE6A12-D897-4450-0D5F-F6DFB6AFB1FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
