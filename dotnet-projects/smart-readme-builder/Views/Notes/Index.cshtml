@@ -55,7 +55,11 @@
                                     <pre>@note.MarkdownText</pre>
                                     @* <span class="note-timestamp">@note.CreatedOn.ToString("g")</span> *@
                                 </div>
-                                <button class="btn btn-secondary btn-sm">Generate markdown</button>
+                                <form asp-controller="Notes" asp-action="AddReadmeToGitHub" method="post">
+                                    <input type="hidden" name="id" value="@note.Id" />
+                                    <button class="btn btn-secondary btn-sm">Push to Github</button>
+                                </form>
+                                
                                 @* <form asp-action="DeleteNote" method="post" class="float-end">
                         <input type="hidden" name="id" value="@note.Id" />
                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>

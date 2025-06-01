@@ -7,6 +7,7 @@ namespace SmartReadmeBuilder.Controllers
 {
     public class NotesController : Controller
     {
+        private readonly GithubClient_API _api;
         public IActionResult Index()
         {
             var notesJson = HttpContext.Session.GetString("Notes") ?? "";
@@ -15,31 +16,27 @@ namespace SmartReadmeBuilder.Controllers
             return View();
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> SaveNotes(Note note)
-        //{
+        public NotesController(GithubClient_API api)
+        {
+            _api = api;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddReadmeToGitHub(Guid id)
+        {
+            var notesJson = HttpContext.Session.GetString("Notes") ?? "";
+            var notes = string.IsNullOrEmpty(notesJson) ? new List<Note>() : JsonSerializer.Deserialize<List<Note>>(notesJson);
+
+            if(notes.Count > 0)
+            {
+                var note = notes.Find(n => n.Id.Equals(id));
+                _api.ConfigureRepo("SashanaFarrier", "test", "master", "Added readme");
+                _api.AddFileToRepository(note.MarkdownText).Wait(); // Wait for the task to complete synchronously
+            }
+
             
-
-        //    var notesJson = HttpContext.Session.GetString("Notes");
-        //    var notes = string.IsNullOrEmpty(notesJson) ? new List<Note>() : JsonSerializer.Deserialize<List<Note>>(notesJson);
-
-
-        //    try
-        //    {
-        //        AIClient api = new AIClient(); // Create an instance of the AIClient
-        //        var response = await api.GetResponseAsync(note.Text); // Await the result properly
-        //        note.Text = response;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        note.Text = $"Error generating response from OpenAI: {ex.Message}";
-        //    }
-
-        //    notes.Add(note);
-        //    HttpContext.Session.SetString("Notes", JsonSerializer.Serialize(notes));
-
-        //    return RedirectToAction("Index");
-        //}
+            return RedirectToAction("Index");
+        }
 
     }
 }

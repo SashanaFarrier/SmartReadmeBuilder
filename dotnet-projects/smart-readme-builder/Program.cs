@@ -1,3 +1,7 @@
+using DotNetEnv;
+using SmartReadmeBuilder.api;
+using SmartReadmeBuilder.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -9,6 +13,15 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true; // Make the session cookie HTTP-only
     options.Cookie.IsEssential = true; // Make the session cookie essential for the application
 });
+
+Env.Load("./.env"); // Load environment variables from .env file
+
+// Register GitHubToken as a singleton
+var token = Environment.GetEnvironmentVariable("GITHUB_TOKEN") ?? throw new Exception("Token is not set");
+builder.Services.AddSingleton<GitHubToken>(new GitHubToken { Token = token });
+
+builder.Services.AddTransient<GithubClient_API>(); 
+
 
 //open ai api key - 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
 
@@ -27,6 +40,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseSession();
+
 
 
 app.UseAuthorization();
