@@ -17,10 +17,10 @@ builder.Services.AddSession(options =>
 Env.Load("./.env"); // Load environment variables from .env file
 
 // Register GitHubToken as a singleton
-var token = Environment.GetEnvironmentVariable("GITHUB_TOKEN") ?? throw new Exception("Token is not set");
-builder.Services.AddSingleton<GitHubToken>(new GitHubToken { Token = token });
+//var token = Environment.GetEnvironmentVariable("GITHUB_TOKEN") ?? throw new Exception("Token not found");
+//builder.Services.AddSingleton<GitHubToken>(new GitHubToken { Token = token });
 
-builder.Services.AddTransient<GithubClient_API>(); 
+//builder.Services.AddTransient<GithubClient_API>(); 
 
 
 //open ai api key - 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

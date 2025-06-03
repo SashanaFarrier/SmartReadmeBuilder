@@ -8,19 +8,12 @@ namespace SmartReadmeBuilder.api
 {
     public class AIClient
     {
-        private readonly ChatClient _client;
-       //ChatClient client = new("gpt-4.1-nano", "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");
-
-        //public AIClient()
-        //{
-            
-        //    _client = new ChatClient("gpt-4.1-nano", "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");
-        //}
-
+        //private readonly ChatClient _client;
+      
         public string GeneratePrompt(string userInput)
         {
             string prompt = $"""  
-                Generate a clean, professional README in markdown with sections like:
+                Generate a detailed, clean and professional README in markdown format with sections like:
                 - Project Title
                 - Description
                 - Build With (include only if build tools or languages are mentioned)
@@ -29,7 +22,7 @@ namespace SmartReadmeBuilder.api
                 - Usage (include only if usage provided)
                 - License 
 
-                The README should also be formatted with proper line breaks and spacing exactly like this example:
+                Include any other relevant sections based on the based on the information provided. The README should also be formatted with proper line breaks and spacing exactly like this example:
 
                 # Project Title
 
@@ -58,7 +51,8 @@ namespace SmartReadmeBuilder.api
 
         public async Task<string> GetResponseAsync(string userInput)
         {
-            var client = new OpenAIClient("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");
+            var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+            var client = new OpenAIClient(apiKey);
             var messages = new List<ChatMessage>
             {
                new SystemChatMessage("You are a helpful assistant that generates professional README.md markdown files."),
