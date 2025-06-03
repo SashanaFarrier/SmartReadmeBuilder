@@ -1,4 +1,5 @@
 ﻿using Octokit;
+using SmartReadmeBuilder.Interfaces;
 using SmartReadmeBuilder.Models;
 //using GitHub.Octokit.Client;
 //using GitHub.Octokit.Client.Authentication;
@@ -6,89 +7,85 @@ using SmartReadmeBuilder.Models;
 
 namespace SmartReadmeBuilder.api
 {
-    public class GithubClient_API
+    public class GithubClient_API : IGitHubRepoConfig
     {
-        //TokenProvider tokenProvider = new TokenProvider("your-github-token-here") ?? "";
-        //RequestAdapter requestAdapter = RequestAdapter.Create(new TokenAuthProvider(tokenProvider));
+       // GitHubInfo GitHubInfo = new GitHubInfo();
+        //private readonly GitHubToken _githubToken;
+       // private readonly IGitHubRepoConfig _gitHubRepoConfig;
+        //public string? Owner { get; set; }
+        //public string? Repo { get; set; }
+        //public string? Branch { get; set; }
+        //public string? CommitMessage { get; set; }
 
-        private readonly GitHubToken _githubToken;
-        private string Owner { get; set; }
-        private string Repo { get; set; }
-        private string Branch { get; set; }
-        private string FilePath { get; set; }
-        private string commitMessage { get; set; }
+        //public GithubClient_API(GitHubToken githubToken)
+        //{
+        //    _githubToken = githubToken;
+          
+        //}
 
-        public GithubClient_API(GitHubToken githubToken)
-        {
-            _githubToken = githubToken;
-        }
+        //public void ConfigureRepo(string owner, string repo, string branch, string commitMessage)
+        //{
+        //    Owner = owner;
+        //    Repo = repo;
+        //    Branch = branch;
+        //    CommitMessage = commitMessage;
+        //}
 
-        public void ConfigureRepo(string owner, string repo, string branch, string commitMessage)
-        {
-            Owner = owner;
-            Repo = repo;
-            Branch = branch;
-            //FilePath = filePath;
-            this.commitMessage = commitMessage;
-
-            
-        }
-
-        public async Task AddFileToRepository(string markdownText)
+        public async Task AddFileToRepository(string owner, string repoName, string branch, string commitMessage, string token, string markdownText)
         {
 
             GitHubClient client = new GitHubClient(new ProductHeaderValue("SmartReadmeBuilder"));
-            var tokenAuth = new Credentials(_githubToken.Token);
-            client.Credentials = tokenAuth;
+            //var token = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
 
-            var newBlob = new NewBlob
+            if(!string.IsNullOrEmpty(token))
             {
-                Content = markdownText,
-                Encoding = EncodingType.Utf8
-            };
+                var tokenAuth = new Credentials(token);
+                client.Credentials = tokenAuth;
 
-            var createdBlob = await client.Git.Blob.Create(Owner, Repo, newBlob);
-            //createdBlob.Dump();
+                var newBlob = new NewBlob
+                {
+                    Content = markdownText,
+                    Encoding = EncodingType.Utf8
+                };
 
-            var newtree = new NewTree();
-            newtree.Tree.Add(new NewTreeItem
-            {
-                Path = "README.md",
-                Mode = Octokit.FileMode.File,
-                Type = TreeType.Blob,
-                Sha = createdBlob.Sha
-            });
+                var createdBlob = await client.Git.Blob.Create(owner, repoName, newBlob);
 
-            var createdTree = await client.Git.Tree.Create(Owner, Repo, newtree);
+                var newtree = new NewTree();
+                newtree.Tree.Add(new NewTreeItem
+                {
+                    Path = "README.md",
+                    Mode = Octokit.FileMode.File,
+                    Type = TreeType.Blob,
+                    Sha = createdBlob.Sha
+                });
 
+                var createdTree = await client.Git.Tree.Create(owner, repoName, newtree);
 
-            //var repoInfo = await client.Repository.Get(Owner, Repo);
-            //var defaultBranch = repoInfo.DefaultBranch;
-            //var master = await client.Git.Reference
-            //.Get(Owner, Repo, "heads/master");
-            var repo = await client.Repository.Get(Owner, Repo);
-            var defaultBranch = repo.DefaultBranch;
+                var repo = await client.Repository.Get(owner, repoName);
+                //var defaultBranch = repo.DefaultBranch;
 
-            var branchReference = await client.Git.Reference.Get(Owner, Repo, "heads/" + defaultBranch);
+                var branchReference = await client.Git.Reference.Get(owner, repoName, "heads/" + branch);
 
-           // var branchReference = await client.Git.Reference.Get(Owner, Repo, client.Repository.Get(Owner, Repo).Result.DefaultBranch);
+                var newCommit = new NewCommit(
+                  //"Added ReadMe",
+                  commitMessage,
+                  createdTree.Sha,
+                  new[] { branchReference.Object.Sha });
 
-            var newCommit = new NewCommit(
-              "Added ReadMe",
-              createdTree.Sha,
-              new[] { branchReference.Object.Sha });
+                var createdCommit = await client.Git.Commit.Create(owner, repoName, newCommit);
 
+                var updateReference = new ReferenceUpdate(createdCommit.Sha);
 
-            var createdCommit = await client.Git.Commit
-                .Create(Owner, Repo, newCommit);
+                //await client.Git.Reference.Update(owner, repoName, "heads/" + defaultBranch, updateReference);
+                //await client.Repository.Content.GetAllContents(owner, repoName, "README.md");
+                await client.Git.Reference.Update(owner, repoName, "heads/" + branch, updateReference);
+                await client.Repository.Content.GetAllContents(owner, repoName, "README.md");
 
+            }
+            //var tokenAuth = new Credentials(_githubToken.Token);
+           
 
-            var updateReference = new ReferenceUpdate(createdCommit.Sha);
-            var updatedReference = await client.Git
-                .Reference.Update(Owner, Repo, "heads/" + defaultBranch, updateReference);
-
-            var readme = await client.Repository.Content.GetAllContents(Owner, Repo, "README.md");
-
+            
 
         }
 

@@ -50,16 +50,22 @@
                     <ul class="list-group">
                         @foreach (var note in (List<Note>)ViewBag.Notes)
                         {
+                            
                             <li class="list-group-item">
                                 <div class="note-content">
                                     <pre>@note.MarkdownText</pre>
                                     @* <span class="note-timestamp">@note.CreatedOn.ToString("g")</span> *@
                                 </div>
-                                <form asp-controller="Notes" asp-action="AddReadmeToGitHub" method="post">
+                                <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">Push to Github</button>
+                                @* <form asp-controller="Notes" asp-action="AddReadmeToGitHub" method="post">
                                     <input type="hidden" name="id" value="@note.Id" />
-                                    <button class="btn btn-secondary btn-sm">Push to Github</button>
-                                </form>
+                                    <button class="btn btn-secondary btn-sm" data-togggle="modal" id="exampleModal">Push to Github</button>
+
+                                    @await Html.PartialAsync("_GithubCredentials", new GitHubInfo { Note = note })
+                                </form> *@
+                                <p>Debug: Note ID = @note.Id</p>
                                 
+                                @await Html.PartialAsync("_GithubCredentials", new GitHubInfo {NoteId = @note.Id  } )
                                 @* <form asp-action="DeleteNote" method="post" class="float-end">
                         <input type="hidden" name="id" value="@note.Id" />
                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>
@@ -74,3 +80,9 @@
            
         </div> 
 </div>
+<!-- Button trigger modal -->
+@* <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Launch demo modal
+</button> *@
+
+<!-- Modal -->
