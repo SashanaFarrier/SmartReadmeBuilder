@@ -22,7 +22,7 @@ namespace SmartReadmeBuilder.api
                 - Usage (include only if usage provided)
                 - License 
 
-                Include any other relevant sections based on the based on the information provided. The README should also be formatted with proper line breaks and spacing exactly like this example:
+                Include emojis and any other relevant sections based on the based on the information provided. The README should also be formatted with proper line breaks and spacing exactly like this example:
 
                 # Project Title
 

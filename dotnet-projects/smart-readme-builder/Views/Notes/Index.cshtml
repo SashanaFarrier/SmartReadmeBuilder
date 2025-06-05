@@ -28,19 +28,22 @@
                                     <p>@note.Text</p>
                                     <span class="note-timestamp">@note.CreatedOn.ToString("g")</span>
                                 </div>
-                                <form asp-controller="Markdown" asp-action="GenerateMarkdownFromPreviousPrompt">
-                                    <input type="hidden" name="Id" value="@note.Id" />
-                                    <button class="btn btn-secondary btn-sm">Regenerate markdown</button>
-                                </form>
+                                <div>
+                                    <form asp-controller="Markdown" asp-action="RegenerateMarkdown">
+                                        <input type="hidden" name="id" value="@note.Id" />
+                                        <button class="btn btn-secondary btn-sm">Regenerate markdown</button>
+                                    </form>
 
-                                <form asp-controller="Notes" asp-action="UpdateMarkdownPrompt" method="post" class="float-end">
-                                    <input type="hidden" name="id" value="@note.Id" />
-                                    <button type="submit" class="btn btn-secondary btn-sm">Edit</button>
-                                </form>
-                                <form asp-controller="Notes" asp-action="DeleteNote" method="post" class="float-end">
-                                    <input type="hidden" name="id" value="@note.Id" />
-                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                </form>
+                                    <form asp-controller="Notes" asp-action="EditPrompt" asp-route-id="@note.Id" method="get" class="float-end">
+                                        <input type="hidden" name="id" value="@note.Id" />
+                                        <button type="submit" class="btn btn-secondary btn-sm">Edit</button>
+                                    </form>
+                                    <form asp-controller="Notes" asp-action="DeleteNote" method="post" class="float-end">
+                                        <input type="hidden" name="id" value="@note.Id" />
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                </div>
+                                
                             </li>
                         }
                     </ul>
@@ -57,14 +60,7 @@
                                     @* <span class="note-timestamp">@note.CreatedOn.ToString("g")</span> *@
                                 </div>
                                 <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">Push to Github</button>
-                                @* <form asp-controller="Notes" asp-action="AddReadmeToGitHub" method="post">
-                                    <input type="hidden" name="id" value="@note.Id" />
-                                    <button class="btn btn-secondary btn-sm" data-togggle="modal" id="exampleModal">Push to Github</button>
 
-                                    @await Html.PartialAsync("_GithubCredentials", new GitHubInfo { Note = note })
-                                </form> *@
-                                <p>Debug: Note ID = @note.Id</p>
-                                
                                 @await Html.PartialAsync("_GithubCredentials", new GitHubInfo {NoteId = @note.Id  } )
                                 @* <form asp-action="DeleteNote" method="post" class="float-end">
                         <input type="hidden" name="id" value="@note.Id" />
