@@ -23,6 +23,7 @@ namespace SmartReadmeBuilder.Controllers
                 note.MarkdownText = response;
 
                 notes?.Add(note);
+                notes = notes?.OrderByDescending(n => n.CreatedOn).ToList();
                 HttpContext.Session.SetString("Notes", JsonSerializer.Serialize(notes));
             }
             catch (Exception ex)
@@ -34,7 +35,7 @@ namespace SmartReadmeBuilder.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GenerateMarkdownFromPreviousPrompt(Guid id)
+        public async Task<IActionResult> RegenerateMarkdown(Guid id)
         {
            
             var notesJson = HttpContext.Session.GetString("Notes");
@@ -42,47 +43,37 @@ namespace SmartReadmeBuilder.Controllers
 
             if(notes?.Count > 0)
             {
+                
                 var selectedNote = notes.Find(n => n.Id.Equals(id)); 
 
                 if(selectedNote is not null)
                 {
                      Note note = new Note();
-                    notes.Remove(selectedNote);
+                     notes.Remove(selectedNote);
 
                     try
                     {
                         AIClient api = new AIClient();
                        
                         var response = await api.GetResponseAsync(selectedNote.Text);
+                        note.CreatedOn = selectedNote.CreatedOn;
                         note.Text = selectedNote.Text;
                         note.MarkdownText = response;
 
                         notes.Add(note);
+                        notes = notes.OrderByDescending(n => n.CreatedOn).ToList();
                         HttpContext.Session.SetString("Notes", JsonSerializer.Serialize(notes));
+                       
                     }
                     catch (Exception ex)
                     {
                         note.Text = $"Error generating response from OpenAI: {ex.Message}";
                     }
+
                 }
 
             }
-            return RedirectToAction("Index", "Notes");
-        }
-
-        [HttpPut]
-        public async Task<IActionResult> UpdateMarkdownPrompt(Guid id)
-        {
-            var notesJson = HttpContext.Session.GetString("Notes");
-            var notes = string.IsNullOrEmpty(notesJson) ? new List<Note>() : JsonSerializer.Deserialize<List<Note>>(notesJson);
-            var existingNote = notes?.Find(n => n.Id.Equals(id));
-            if (existingNote != null)
-            {
-                Note note = new Note();
-                note.Text = existingNote.Text;
-                existingNote.MarkdownText = note.MarkdownText;
-                HttpContext.Session.SetString("Notes", JsonSerializer.Serialize(notes));
-            }
+           
             return RedirectToAction("Index", "Notes");
         }
     }

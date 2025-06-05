@@ -1,36 +1,12 @@
 ﻿using Octokit;
 using SmartReadmeBuilder.Interfaces;
 using SmartReadmeBuilder.Models;
-//using GitHub.Octokit.Client;
-//using GitHub.Octokit.Client.Authentication;
 
 
 namespace SmartReadmeBuilder.api
 {
     public class GithubClient_API : IGitHubRepoConfig
     {
-       // GitHubInfo GitHubInfo = new GitHubInfo();
-        //private readonly GitHubToken _githubToken;
-       // private readonly IGitHubRepoConfig _gitHubRepoConfig;
-        //public string? Owner { get; set; }
-        //public string? Repo { get; set; }
-        //public string? Branch { get; set; }
-        //public string? CommitMessage { get; set; }
-
-        //public GithubClient_API(GitHubToken githubToken)
-        //{
-        //    _githubToken = githubToken;
-          
-        //}
-
-        //public void ConfigureRepo(string owner, string repo, string branch, string commitMessage)
-        //{
-        //    Owner = owner;
-        //    Repo = repo;
-        //    Branch = branch;
-        //    CommitMessage = commitMessage;
-        //}
-
         public async Task AddFileToRepository(string owner, string repoName, string branch, string commitMessage, string token, string markdownText)
         {
 
@@ -82,16 +58,8 @@ namespace SmartReadmeBuilder.api
                 await client.Repository.Content.GetAllContents(owner, repoName, "README.md");
 
             }
-            //var tokenAuth = new Credentials(_githubToken.Token);
-           
-
-            
 
         }
-
-
-
-
 
     }
 
