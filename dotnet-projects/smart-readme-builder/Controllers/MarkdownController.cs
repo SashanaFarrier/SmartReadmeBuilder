@@ -12,6 +12,13 @@ namespace SmartReadmeBuilder.Controllers
         public async Task<IActionResult> GenerateMarkdown(Note note)
         {
 
+            if(string.IsNullOrWhiteSpace(note.Text) || note.Text.Length < 20)
+            {
+                ModelState.AddModelError("Text", "Please provide a more detailed description of your project. A minimum of 20 characters is required to generate a meaningful README. ");
+
+                return View("~/Views/Home/Index.cshtml");
+            }
+
             var notesJson = HttpContext.Session.GetString("Notes");
             var notes = string.IsNullOrEmpty(notesJson) ? new List<Note>() : JsonSerializer.Deserialize<List<Note>>(notesJson);
 
@@ -25,6 +32,7 @@ namespace SmartReadmeBuilder.Controllers
                 notes?.Add(note);
                 notes = notes?.OrderByDescending(n => n.CreatedOn).ToList();
                 HttpContext.Session.SetString("Notes", JsonSerializer.Serialize(notes));
+
             }
             catch (Exception ex)
             {

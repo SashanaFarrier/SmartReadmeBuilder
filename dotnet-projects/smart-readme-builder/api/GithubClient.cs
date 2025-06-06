@@ -10,8 +10,12 @@ namespace SmartReadmeBuilder.api
         public async Task AddFileToRepository(string owner, string repoName, string branch, string commitMessage, string token, string markdownText)
         {
 
+
+
+            //fix this and check if github token is valid and other parameters are valid
             GitHubClient client = new GitHubClient(new ProductHeaderValue("SmartReadmeBuilder"));
             //var token = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
+
 
             if(!string.IsNullOrEmpty(token))
             {
@@ -60,6 +64,27 @@ namespace SmartReadmeBuilder.api
             }
 
         }
+
+        //async Task<Boolean> IsGitHubCredentialsValid(GitHubClient client, string owner, string repo, string branch)
+        //{
+        //    bool isValid = false;
+        //    try
+        //    {
+        //        await client.Repository.Branch.Get(owner, repo, branch);
+
+        //        if(owner is null || repo is null || branch is null)
+        //        {
+        //            isValid = false;
+        //        }
+
+        //    }
+        //    catch (NotFoundException)
+        //    {
+        //        return false;
+        //    }
+
+        //    return isValid;
+        //}
 
     }
 

@@ -12,7 +12,7 @@
     public class NoteViewModel
     {
         public List<Note> Notes { get; set; } = new List<Note>();
-        public string NewNoteText { get; set; } = string.Empty;
+        //public string NewNoteText { get; set; } = string.Empty;
     }
 
 

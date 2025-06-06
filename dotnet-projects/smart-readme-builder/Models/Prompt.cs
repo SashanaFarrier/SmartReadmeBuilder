@@ -1,8 +1,13 @@
-﻿namespace SmartReadmeBuilder.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SmartReadmeBuilder.Models
 {
-    public class Character
+    public class Prompt
     {
+        [Required(ErrorMessage = "This field is required. Please describe your app.")]
         public string Text { get; set; } = string.Empty;
+
+        public bool IsValid => !string.IsNullOrEmpty(Text) && Text.Length > 20;
         public int Count { get; set; } = 0;
         public int Words { get; set; } = 0;
 
