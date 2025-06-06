@@ -5,10 +5,35 @@
     ViewData["Title"] = "Markdowns";
 }
 
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
 @{
+    
+    if (TempData["DeleteSuccess"] != null)
+    {
+        var timeDeleted = DateTime.UtcNow - (DateTime)TempData["DeletedAt"];
+       
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto">@TempData["DeleteSuccess"]</strong>
+                    <small>@((int)timeDeleted.TotalSeconds) seconds ago</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+               
+            </div>
+        </div>
+    }
+
+    if(TempData["PushSuccess"] != null)
+    {
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto">@TempData["PushSuccess"]</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 <div class="container-fluid">
@@ -38,10 +63,35 @@
                                         <input type="hidden" name="id" value="@note.Id" />
                                         <button type="submit" class="btn btn-secondary btn-sm">Edit</button>
                                     </form>
-                                    <form asp-controller="Notes" asp-action="DeleteNote" method="post" class="float-end">
-                                        <input type="hidden" name="id" value="@note.Id" />
-                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                    </form>
+                                    
+                                    <!-- Button trigger modal -->
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deletePrompt">
+                                        Delete
+                                    </button>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="deletePrompt" tabindex="-1" aria-labelledby="deletePrompt" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    @* <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1> *@
+                                                    <h4 class="modal-title" id="deletePrompt">Delete Prompt - @note.Text.Substring(0, 15)...</h4>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                   <p>Are you sure you want to delete this prompt? This cannot be undone.</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <form asp-controller="Notes" asp-action="DeleteNote" method="post" class="float-end">
+                                                        <input type="hidden" name="id" value="@note.Id" />
+                                                        <button type="submit" class="btn btn-danger">Confirm</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                   
                                 </div>
                                 
                             </li>
@@ -59,7 +109,7 @@
                                     <pre>@note.MarkdownText</pre>
                                     @* <span class="note-timestamp">@note.CreatedOn.ToString("g")</span> *@
                                 </div>
-                                <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">Push to Github</button>
+                                <button id="pushBtn" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#githubModal">Push to Github</button>
 
                                 @await Html.PartialAsync("_GithubCredentials", new GitHubInfo {NoteId = @note.Id  } )
                                 @* <form asp-action="DeleteNote" method="post" class="float-end">
@@ -76,9 +126,16 @@
            
         </div> 
 </div>
-<!-- Button trigger modal -->
-@* <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    Launch demo modal
-</button> *@
+@section Scripts {
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            var toastEl = document.querySelector('.toast');
+            if (toastEl) {
+                var toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            }
+        });
 
-<!-- Modal -->
+    </script>
+
+}

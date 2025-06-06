@@ -1,11 +1,19 @@
-﻿namespace SmartReadmeBuilder.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SmartReadmeBuilder.Models
 {
     public class GitHubInfo
     {
         public Guid NoteId { get; set; }
-        public string? Owner { get; set; }
-        public string? Repo { get; set; }
-        public string? Branch { get; set; }
-        public string? CommitMessage { get; set; }
+        [Required]
+        public string Owner { get; set; }
+        [Required]
+        public string Repo { get; set; }
+        [Required]
+        public string Branch { get; set; }
+        [Required]
+        public string CommitMessage { get; set; }
+        [Required]
+        public string GithubToken { get; set; }
     }
 }

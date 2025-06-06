@@ -19,14 +19,14 @@ namespace SmartReadmeBuilder.Controllers
         public IActionResult Index()
         {
            
-            return View(new Character());
+            return View(new Prompt());
         }
 
         [HttpPost]
 
-        public IActionResult Index(Character model)
+        public IActionResult Index(Prompt model)
         {
-            Character character = new Character();
+            Prompt character = new Prompt();
             character.Text = model.Text ?? string.Empty;
             //character.Count = model.CountCharacters();
             character.Words = model.CountWords();

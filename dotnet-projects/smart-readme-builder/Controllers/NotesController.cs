@@ -29,12 +29,18 @@ namespace SmartReadmeBuilder.Controllers
             var notesJson = HttpContext.Session.GetString("Notes") ?? "";
             var notes = string.IsNullOrEmpty(notesJson) ? new List<Note>() : JsonSerializer.Deserialize<List<Note>>(notesJson);
             ViewBag.Notes = notes;
+
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> PushToGitHub(Guid id)
         {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
             var notesJson = HttpContext.Session.GetString("Notes") ?? "";
             var notes = string.IsNullOrEmpty(notesJson) ? new List<Note>() : JsonSerializer.Deserialize<List<Note>>(notesJson);
 
@@ -46,6 +52,8 @@ namespace SmartReadmeBuilder.Controllers
                 if (note is null) return NotFound("Note not found");
 
                 GitHubAPI.AddFileToRepository(Owner, Repo, Branch, CommitMessage, GithubToken, note.MarkdownText);
+
+                TempData["PushSuccess"] = "Note pushed to GitHub successfully.";
                 //GitHubAPI.ConfigureRepo("SashanaFarrier", "test", "master", "Added readme");
                 //GitHubAPI.AddFileToRepository(note.MarkdownText).Wait();  
             }
@@ -120,6 +128,11 @@ namespace SmartReadmeBuilder.Controllers
         [HttpPost]
         public IActionResult DeleteNote(Guid id)
         {
+            if (id == Guid.Empty)
+            {
+                return BadRequest("Invalid note ID.");
+            }
+
             var notesJson = HttpContext.Session.GetString("Notes") ?? "";
             var notes = string.IsNullOrEmpty(notesJson) ? new List<Note>() : JsonSerializer.Deserialize<List<Note>>(notesJson);
             
@@ -130,6 +143,12 @@ namespace SmartReadmeBuilder.Controllers
                 {
                     notes.Remove(note);
                     HttpContext.Session.SetString("Notes", JsonSerializer.Serialize(notes));
+
+                    TempData["DeleteSuccess"] = "Note deleted successfully.";
+                    TempData["DeletedAt"] = DateTime.UtcNow;
+
+                    return RedirectToAction("Index");
+                   // return View("~/Views/Notes/Index.cshtml", new NoteViewModel {Notes = notes});
                 }
             }
             return RedirectToAction("Index");
