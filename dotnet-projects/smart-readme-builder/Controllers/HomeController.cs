@@ -29,8 +29,8 @@ namespace SmartReadmeBuilder.Controllers
             Prompt character = new Prompt();
             character.Text = model.Text ?? string.Empty;
             //character.Count = model.CountCharacters();
-            character.Words = model.CountWords();
-            character.Sentences = model.CountSentences();
+           // character.Words = model.CountWords();
+            //character.Sentences = model.CountSentences();
             return View(character);
         }
 

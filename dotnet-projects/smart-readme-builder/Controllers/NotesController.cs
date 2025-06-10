@@ -12,17 +12,17 @@ namespace SmartReadmeBuilder.Controllers
         //private readonly GithubClient_API _api;
         GithubClient_API GitHubAPI = new GithubClient_API();
 
-        [BindProperty]
-        public string ? Owner { get; set; }
-        [BindProperty]
-        public string ? Repo { get; set; }
-        [BindProperty]
-        public string ? Branch { get; set; }
-        [BindProperty]
-        public string ? CommitMessage { get; set; }
+        //[BindProperty]
+        //public string ? Owner { get; set; }
+        //[BindProperty]
+        //public string ? Repo { get; set; }
+        //[BindProperty]
+        //public string ? Branch { get; set; }
+        //[BindProperty]
+        //public string ? CommitMessage { get; set; }
 
-        [BindProperty]
-        public string ? GithubToken { get; set; }
+        //[BindProperty]
+        //public string ? GithubToken { get; set; }
 
         public IActionResult Index()
         {
@@ -34,7 +34,7 @@ namespace SmartReadmeBuilder.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PushToGitHub(Guid id)
+        public async Task<IActionResult> PushToGitHub(GitHubInfo gitHubInfo)
         {
             if (!ModelState.IsValid)
             {
@@ -47,11 +47,22 @@ namespace SmartReadmeBuilder.Controllers
 
             if (notes?.Count > 0)
             {
-                var note = notes.Find(n => n.Id.Equals(id));
+                var note = notes.Find(n => n.Id.Equals(gitHubInfo.NoteId));
+                var username = gitHubInfo.Username;
+                var repo = gitHubInfo.Repo;
+                var branch = gitHubInfo.Branch;
+                var commitMessage = gitHubInfo.CommitMessage;
+                var githubToken = gitHubInfo.GithubToken;
 
                 if (note is null) return NotFound("Note not found");
 
-                GitHubAPI.AddFileToRepository(Owner, Repo, Branch, CommitMessage, GithubToken, note.MarkdownText);
+                if(!await GitHubAPI.AddFileToRepository(username, repo, branch, commitMessage, githubToken, note.MarkdownText))
+                {
+                    TempData["PushError"] = "Something went wrong. GitHub credentials could not be authenticated.";
+                    return RedirectToAction("Index");
+                }
+
+                GitHubAPI.AddFileToRepository(username, repo, branch, commitMessage, githubToken, note.MarkdownText);
 
                 TempData["PushSuccess"] = "Note pushed to GitHub successfully.";
                 //GitHubAPI.ConfigureRepo("SashanaFarrier", "test", "master", "Added readme");

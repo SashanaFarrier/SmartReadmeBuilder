@@ -6,14 +6,14 @@ namespace SmartReadmeBuilder.Models
     {
         public Guid NoteId { get; set; }
         [Required]
-        public string Owner { get; set; }
+        public string? Username { get; set; }
         [Required]
-        public string Repo { get; set; }
+        public string? Repo { get; set; }
         [Required]
-        public string Branch { get; set; }
+        public string? Branch { get; set; }
         [Required]
-        public string CommitMessage { get; set; }
+        public string? CommitMessage { get; set; }
         [Required]
-        public string GithubToken { get; set; }
+        public string? GithubToken { get; set; }
     }
 }
