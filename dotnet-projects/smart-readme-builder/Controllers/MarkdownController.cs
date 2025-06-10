@@ -7,6 +7,7 @@ namespace SmartReadmeBuilder.Controllers
 {
     public class MarkdownController : Controller
     {
+        
 
         [HttpPost]
         public async Task<IActionResult> GenerateMarkdown(Note note)
@@ -28,10 +29,13 @@ namespace SmartReadmeBuilder.Controllers
                 AIClient api = new AIClient(); 
                 var response = await api.GetResponseAsync(note.Text); 
                 note.MarkdownText = response;
+               // note.Id = new Guid();
 
                 notes?.Add(note);
                 notes = notes?.OrderByDescending(n => n.CreatedOn).ToList();
                 HttpContext.Session.SetString("Notes", JsonSerializer.Serialize(notes));
+
+               
 
             }
             catch (Exception ex)

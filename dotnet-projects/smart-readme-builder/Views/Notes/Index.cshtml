@@ -6,7 +6,7 @@
 }
 
 @{
-    
+
     if (TempData["DeleteSuccess"] != null)
     {
         var timeDeleted = DateTime.UtcNow - (DateTime)TempData["DeletedAt"];
@@ -25,15 +25,29 @@
 
     if(TempData["PushSuccess"] != null)
     {
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header">
-                    <strong class="me-auto">@TempData["PushSuccess"]</strong>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
+        <div class="toast bg-success position-fixed top-0 end-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+            <div class="toast-header d-flex justify-content-between">
+                <small>@DateTime.UtcNow.ToShortTimeString()) minutes ago</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                <strong class="me-auto">@TempData["PushSuccess"]</strong>
+            </div>
+        </div>
+    } else if(TempData["PushError"] != null)
+    {
+        var time = DateTime.UtcNow;
+        <div class="toast bg-danger position-fixed top-0 end-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+            <div class="toast-header d-flex justify-content-between">
+                <small>@((int)time.Minute) minutes ago</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                <strong class="me-auto">@TempData["PushError"]</strong>
             </div>
         </div>
     }
+
 }
 
 <div class="container-fluid">
@@ -65,17 +79,17 @@
                                     </form>
                                     
                                     <!-- Button trigger modal -->
-                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deletePrompt">
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deletePrompt-@note.Id">
                                         Delete
                                     </button>
 
                                     <!-- Modal -->
-                                    <div class="modal fade" id="deletePrompt" tabindex="-1" aria-labelledby="deletePrompt" aria-hidden="true">
+                                    <div class="modal fade" id="deletePrompt-@note.Id" tabindex="-1" aria-labelledby="deletePrompt-@note.Id" aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
                                                     @* <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1> *@
-                                                    <h4 class="modal-title" id="deletePrompt">Delete Prompt - @note.Text.Substring(0, 15)...</h4>
+                                                    <h4 class="modal-title" id="deletePrompt-@note.Id">Delete Prompt - @note.Text.Substring(0, 15)...</h4>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
@@ -103,15 +117,30 @@
                     <ul class="list-group">
                         @foreach (var note in (List<Note>)ViewBag.Notes)
                         {
+                            var modalId = $"githubModal-{note.Id}";
                             
                             <li class="list-group-item">
                                 <div class="note-content">
+                                    <button class="btn btn-secondary btn-sm pushBtn" data-bs-toggle="modal" data-bs-target="#@modalId">Push to Github</button>
                                     <pre>@note.MarkdownText</pre>
                                     @* <span class="note-timestamp">@note.CreatedOn.ToString("g")</span> *@
                                 </div>
-                                <button id="pushBtn" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#githubModal">Push to Github</button>
 
-                                @await Html.PartialAsync("_GithubCredentials", new GitHubInfo {NoteId = @note.Id  } )
+                                <div class="modal fade" id="@modalId" tabindex="-1" aria-labelledby="@modalId" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="githubModalLabel-@note.Id">Modal title</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                @await Html.PartialAsync("_GithubCredentials", new GitHubInfo() { NoteId = @note.Id })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                               
                                 @* <form asp-action="DeleteNote" method="post" class="float-end">
                         <input type="hidden" name="id" value="@note.Id" />
                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>
