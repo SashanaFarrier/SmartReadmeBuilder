@@ -1,0 +1,14 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model Note
+
+<form asp-controller="Markdown" asp-action="Edit" method="post">
+    <div asp-validation-summary="ModelOnly" class=""></div>
+    @* <label asp-for="Text"></label> *@
+    <input asp-for="Id" type="hidden" />
+    <label asp-for="MarkdownText" class="form-label">Edit Markdown</label>
+    <textarea asp-for="MarkdownText" id="textbox" rows="30" class="w-100" ></textarea>
+    <button type="submit" class="btn btn-primary mt-2">Save</button>
+    <span asp-validation-for="Text" class="text-danger"></span>
+</form>
