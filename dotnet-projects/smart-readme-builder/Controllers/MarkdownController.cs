@@ -88,5 +88,37 @@ namespace SmartReadmeBuilder.Controllers
            
             return RedirectToAction("Index", "Notes");
         }
+
+        [HttpGet]
+        public IActionResult Edit(Guid id)
+        {
+            var notesJson = HttpContext.Session.GetString("Notes") ?? "";
+            var notes = string.IsNullOrEmpty(notesJson) ? new List<Note>() : JsonSerializer.Deserialize<List<Note>>(notesJson);
+            var existingNote = notes?.Find(n => n.Id.Equals(id));
+
+            if (existingNote is not null)
+            {
+                return View("~/Views/Markdown/Edit.cshtml", new Note { MarkdownText = existingNote.MarkdownText });
+            } else
+            {
+                return NotFound("Markdown not found");
+            }
+           
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(Note note)
+        {
+            var notesJson = HttpContext.Session.GetString("Notes") ?? "";
+            var notes = string.IsNullOrEmpty(notesJson) ? new List<Note>() : JsonSerializer.Deserialize<List<Note>>(notesJson);
+            var existingNote = notes?.Find(n => n.Id.Equals(note.Id));
+            if (existingNote is not null)
+            {
+                existingNote.MarkdownText = note.MarkdownText;
+                HttpContext.Session.SetString("Notes", JsonSerializer.Serialize(notes));
+                return RedirectToAction("Index", "Notes");
+            }
+            return NotFound("Markdown not found");
+        }
     }
 }

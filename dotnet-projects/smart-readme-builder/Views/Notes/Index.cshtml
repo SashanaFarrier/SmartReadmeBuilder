@@ -122,6 +122,12 @@
                             <li class="list-group-item">
                                 <div class="note-content">
                                     <button class="btn btn-secondary btn-sm pushBtn" data-bs-toggle="modal" data-bs-target="#@modalId">Push to Github</button>
+                                    <form asp-controller="Markdown" asp-action="Edit" asp-route-id="@note.Id" method="get">
+                                        <input type="hidden" name="Markdowntext" value="@note.Id" />
+                                        <button class="btn btn-secondary btn-sm">Edit</button>
+                                    </form>
+                                   
+                                    <button id="copy-btn" class="btn btn-secondary btn-sm">Copy to Clipboard</button>
                                     <pre>@note.MarkdownText</pre>
                                     @* <span class="note-timestamp">@note.CreatedOn.ToString("g")</span> *@
                                 </div>
@@ -164,6 +170,19 @@
                 toast.show();
             }
         });
+
+         document.getElementById("copy-btn").addEventListener("click", () => copyMarkdownTextToClipboard());
+
+        async function copyMarkdownTextToClipboard() {
+          try {
+            const markdownText = document.querySelector("pre").innerText;
+            await navigator.clipboard.writeText(markdownText);
+            alert("Markdown copied to clipboard!");
+          } catch (error) {
+            console.error(error.message);
+            alert("Failed to copy markdown to clipboard. Please try again.");
+          }
+        }
 
     </script>
 
