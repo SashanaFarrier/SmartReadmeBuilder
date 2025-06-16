@@ -8,11 +8,11 @@
 <div class="text-center">
     <h1 class="display-4">Smart README Builder</h1>
     <h2>Tell us about your application to get started.</h2>
-    <form asp-controller="Markdown" asp-action="GenerateMarkdown" method="post">
+    <form asp-controller="Prompt" asp-action="CreatePrompt" method="post">
         <div asp-validation-summary="ModelOnly" class=""></div>
         @* <label asp-for="Text"></label> *@
         <textarea asp-for="Text" id="textbox" rows="10" cols="100" placeholder="Describe your app to generate a readME..."></textarea>
-        <button type="submit" class="btn btn-primary mt-2">Generate Markdown</button>
+        <button type="submit" class="btn btn-primary mt-2">Create Markdown</button>
         <span asp-validation-for="Text" class="text-danger"></span>
     </form>
     @* <div class="mt-3">

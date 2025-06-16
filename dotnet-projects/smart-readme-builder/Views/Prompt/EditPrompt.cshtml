@@ -1,11 +1,11 @@
-﻿@model Note
+﻿@model Prompt
 @{
     ViewData["Title"] = "Update Markdown Prompt";
 }
 
 <div class="container-fluid">
     <h1 class="display-4">Update Markdown Prompt</h1>
-    <form asp-action="EditPrompt" asp-controller="Notes" method="post">
+    <form asp-action="EditPrompt" asp-controller="Prompt" method="post">
         <input type="hidden" name="id" value="@Model.Id" />
         <div class="mb-3">
             <label for="markdownText" class="form-label">Edit Prompt</label>

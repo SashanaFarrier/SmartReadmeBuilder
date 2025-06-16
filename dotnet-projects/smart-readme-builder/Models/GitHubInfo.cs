@@ -4,7 +4,7 @@ namespace SmartReadmeBuilder.Models
 {
     public class GitHubInfo
     {
-        public Guid NoteId { get; set; }
+        public Guid MarkdownId { get; set; }
         [Required]
         public string? Username { get; set; }
         [Required]

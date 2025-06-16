@@ -52,13 +52,6 @@ namespace SmartReadmeBuilder.api
 
         public async Task<string> GetResponseAsync(string userInput)
         {
-            //if (!IsPromptValid(userInput))
-            //{
-            //    //ViewData["Error"] = "Invalid prompt. Please provide a more detailed description of your project.";
-            //    //ViewBag.Error = "Invalid prompt. Please provide a more detailed description of your project.";
-            //    //return "Invalid prompt. Please provide a more detailed description of your project.";
-            //}
-
             var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
             var client = new OpenAIClient(apiKey);
             var messages = new List<ChatMessage>

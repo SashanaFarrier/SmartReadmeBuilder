@@ -1,124 +1,108 @@
-﻿using SmartReadmeBuilder.api;
-using SmartReadmeBuilder.Models;
+﻿using Esprima.Ast;
 using Microsoft.AspNetCore.Mvc;
+using Octokit;
+using SmartReadmeBuilder.api;
+using SmartReadmeBuilder.Models;
+using SmartReadmeBuilder.Repositories;
+using SmartReadmeBuilder.ViewModels;
 using System.Text.Json;
 
 namespace SmartReadmeBuilder.Controllers
 {
     public class MarkdownController : Controller
     {
+        private readonly IMarkdownRepository _markdownRepository;
+
+        GithubClient_API GitHubAPI = new GithubClient_API();
+        public MarkdownController(IMarkdownRepository markdownRepository)
+        {
+            _markdownRepository = markdownRepository; 
+        }
+
         
-
-        [HttpPost]
-        public async Task<IActionResult> GenerateMarkdown(Note note)
-        {
-
-            if(string.IsNullOrWhiteSpace(note.Text) || note.Text.Length < 20)
-            {
-                ModelState.AddModelError("Text", "Please provide a more detailed description of your project. A minimum of 20 characters is required to generate a meaningful README. ");
-
-                return View("~/Views/Home/Index.cshtml");
-            }
-
-            var notesJson = HttpContext.Session.GetString("Notes");
-            var notes = string.IsNullOrEmpty(notesJson) ? new List<Note>() : JsonSerializer.Deserialize<List<Note>>(notesJson);
-
-            try
-            {
-          
-                AIClient api = new AIClient(); 
-                var response = await api.GetResponseAsync(note.Text); 
-                note.MarkdownText = response;
-               // note.Id = new Guid();
-
-                notes?.Add(note);
-                notes = notes?.OrderByDescending(n => n.CreatedOn).ToList();
-                HttpContext.Session.SetString("Notes", JsonSerializer.Serialize(notes));
-
-               
-
-            }
-            catch (Exception ex)
-            {
-                note.Text = $"Error generating response from OpenAI: {ex.Message}";
-            }
-
-            return RedirectToAction("Index", "Notes");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> RegenerateMarkdown(Guid id)
-        {
-           
-            var notesJson = HttpContext.Session.GetString("Notes");
-            var notes = string.IsNullOrEmpty(notesJson) ? new List<Note>() : JsonSerializer.Deserialize<List<Note>>(notesJson);
-
-            if(notes?.Count > 0)
-            {
-                
-                var selectedNote = notes.Find(n => n.Id.Equals(id)); 
-
-                if(selectedNote is not null)
-                {
-                     Note note = new Note();
-                     notes.Remove(selectedNote);
-
-                    try
-                    {
-                        AIClient api = new AIClient();
-                       
-                        var response = await api.GetResponseAsync(selectedNote.Text);
-                        note.CreatedOn = selectedNote.CreatedOn;
-                        note.Text = selectedNote.Text;
-                        note.MarkdownText = response;
-
-                        notes.Add(note);
-                        notes = notes.OrderByDescending(n => n.CreatedOn).ToList();
-                        HttpContext.Session.SetString("Notes", JsonSerializer.Serialize(notes));
-                       
-                    }
-                    catch (Exception ex)
-                    {
-                        note.Text = $"Error generating response from OpenAI: {ex.Message}";
-                    }
-
-                }
-
-            }
-           
-            return RedirectToAction("Index", "Notes");
-        }
-
         [HttpGet]
         public IActionResult Edit(Guid id)
         {
-            var notesJson = HttpContext.Session.GetString("Notes") ?? "";
-            var notes = string.IsNullOrEmpty(notesJson) ? new List<Note>() : JsonSerializer.Deserialize<List<Note>>(notesJson);
-            var existingNote = notes?.Find(n => n.Id.Equals(id));
+            var prompts = _markdownRepository.GetAllPrompts().ToList();
+            var existingMarkdown = prompts?.Find(m => m.MarkdownId.Equals(id));
 
-            if (existingNote is not null)
-            {
-                return View("~/Views/Markdown/Edit.cshtml", new Note { MarkdownText = existingNote.MarkdownText });
-            } else
+            if(existingMarkdown is null)
             {
                 return NotFound("Markdown not found");
             }
-           
+
+            //MarkdownViewModel markdownViewModel = new MarkdownViewModel
+            //{
+            //    MarkdownText = existingMarkdown.MarkdownText
+            //};
+
+            return View("~/Views/Markdown/Edit.cshtml", existingMarkdown);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Note note)
+
+        //fix duplicate id
+        public IActionResult Edit(Prompt prompt)
         {
-            var notesJson = HttpContext.Session.GetString("Notes") ?? "";
-            var notes = string.IsNullOrEmpty(notesJson) ? new List<Note>() : JsonSerializer.Deserialize<List<Note>>(notesJson);
-            var existingNote = notes?.Find(n => n.Id.Equals(note.Id));
-            if (existingNote is not null)
+            //var notesJson = HttpContext.Session.GetString("Notes") ?? "";
+            //var notes = string.IsNullOrEmpty(notesJson) ? new List<Note>() : JsonSerializer.Deserialize<List<Note>>(notesJson);
+            var prompts = _markdownRepository.GetAllPrompts().ToList();
+            var existingMarkdown = prompts?.Find(m => m.MarkdownId.Equals(prompt.MarkdownId));
+            if (existingMarkdown is not null)
             {
-                existingNote.MarkdownText = note.MarkdownText;
-                HttpContext.Session.SetString("Notes", JsonSerializer.Serialize(notes));
-                return RedirectToAction("Index", "Notes");
+                existingMarkdown.MarkdownText = prompt.MarkdownText;
+                _markdownRepository.SaveChanges();
+                //HttpContext.Session.SetString("Notes", JsonSerializer.Serialize(notes));
+                return RedirectToAction("Index");
             }
             return NotFound("Markdown not found");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> PushToGitHub(GitHubInfo gitHubInfo)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
+            //var notesJson = HttpContext.Session.GetString("Notes") ?? "";
+            //var notes = string.IsNullOrEmpty(notesJson) ? new List<Prompt>() : JsonSerializer.Deserialize<List<Prompt>>(notesJson);
+            var markdown = _markdownRepository.GetAllPrompts().ToList().Find(m => m.MarkdownId.Equals(gitHubInfo.MarkdownId));
+
+
+            if (markdown is null)
+            {
+                TempData["PushError"] = "No markdown available to push to GitHub.";
+                return RedirectToAction("Index");
+            }
+
+            //var markdown = markdowns.Find(m => m.MarkdownId.Equals(gitHubInfo.MarkdownId)) ?? null;
+            //if (markdown is null) return NotFound("Note not found");
+
+                var username = gitHubInfo.Username;
+                var repo = gitHubInfo.Repo;
+                var branch = gitHubInfo.Branch;
+                var commitMessage = gitHubInfo.CommitMessage;
+                var githubToken = gitHubInfo.GithubToken;
+
+             
+
+                if (!await GitHubAPI.AddFileToRepository(username, repo, branch, commitMessage, githubToken, markdown.MarkdownText))
+                {
+                    TempData["PushError"] = "Something went wrong. GitHub credentials could not be authenticated.";
+                    return RedirectToAction("Index");
+                }
+
+                GitHubAPI.AddFileToRepository(username, repo, branch, commitMessage, githubToken, markdown.MarkdownText);
+
+                TempData["PushSuccess"] = "Note pushed to GitHub successfully.";
+                //GitHubAPI.ConfigureRepo("SashanaFarrier", "test", "master", "Added readme");
+                //GitHubAPI.AddFileToRepository(note.MarkdownText).Wait();  
+            
+
+            return RedirectToAction("Index");
+        }
+
     }
 }
