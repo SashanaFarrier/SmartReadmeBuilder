@@ -1,6 +1,7 @@
 using DotNetEnv;
 using SmartReadmeBuilder.api;
 using SmartReadmeBuilder.Models;
+using SmartReadmeBuilder.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,9 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true; // Make the session cookie HTTP-only
     options.Cookie.IsEssential = true; // Make the session cookie essential for the application
 });
+
+builder.Services.AddHttpContextAccessor(); // Add HttpContextAccessor to access HttpContext in repositories
+builder.Services.AddScoped<IMarkdownRepository, MarkdownRepository>(); // Register MarkdownRepository as a transient service
 
 Env.Load("./.env"); // Load environment variables from .env file
 

@@ -1,5 +1,5 @@
-﻿@using SmartReadmeBuilder.Models
-@model NoteViewModel;
+﻿@using SmartReadmeBuilder.ViewModels;
+@model List<PromptViewModel>;
 
 @{
     ViewData["Title"] = "Markdowns";
@@ -55,12 +55,12 @@
     @* <h2>Manage your Prompts.</h2> *@
         <div class="mt-3">
             <div class="d-flex justify-content-between">
-            @if (ViewBag.Notes != null)
+            @if (ViewBag.Prompts != null)
             {
                 <div class="prompt-history col-4">
                     <h3>Prompt history</h3>
                     <ul class="list-group">
-                        @foreach (var note in (List<Note>)ViewBag.Notes)
+                        @foreach (var note in (List<Prompt>)ViewBag.Prompts)
                         {
                             <li class="list-group-item">
                                 <div class="note-content">
@@ -68,12 +68,12 @@
                                     <span class="note-timestamp">@note.CreatedOn.ToString("g")</span>
                                 </div>
                                 <div>
-                                    <form asp-controller="Markdown" asp-action="RegenerateMarkdown">
+                                    <form asp-controller="Prompt" asp-action="RegenerateMarkdown">
                                         <input type="hidden" name="id" value="@note.Id" />
                                         <button class="btn btn-secondary btn-sm">Regenerate markdown</button>
                                     </form>
 
-                                    <form asp-controller="Notes" asp-action="EditPrompt" asp-route-id="@note.Id" method="get" class="float-end">
+                                    <form asp-controller="Prompt" asp-action="EditPrompt" asp-route-id="@note.Id" method="get" class="float-end">
                                         <input type="hidden" name="id" value="@note.Id" />
                                         <button type="submit" class="btn btn-secondary btn-sm">Edit</button>
                                     </form>
@@ -97,7 +97,7 @@
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                    <form asp-controller="Notes" asp-action="DeleteNote" method="post" class="float-end">
+                                                    <form asp-controller="Prompt" asp-action="DeletePrompt" method="post" class="float-end">
                                                         <input type="hidden" name="id" value="@note.Id" />
                                                         <button type="submit" class="btn btn-danger">Confirm</button>
                                                     </form>
@@ -115,20 +115,20 @@
                 <div class="readmes col-7">
                     <h3>Markdowns:</h3>
                     <ul class="list-group">
-                        @foreach (var note in (List<Note>)ViewBag.Notes)
+                        @foreach (var markdown in (List<Prompt>)ViewBag.Prompts)
                         {
-                            var modalId = $"githubModal-{note.Id}";
+                            var modalId = $"githubModal-{markdown.MarkdownId}";
                             
                             <li class="list-group-item">
                                 <div class="note-content">
                                     <button class="btn btn-secondary btn-sm pushBtn" data-bs-toggle="modal" data-bs-target="#@modalId">Push to Github</button>
-                                    <form asp-controller="Markdown" asp-action="Edit" asp-route-id="@note.Id" method="get">
-                                        <input type="hidden" name="Markdowntext" value="@note.Id" />
+                                    <form asp-controller="Markdown" asp-action="Edit" asp-route-id="@markdown.MarkdownId" method="get">
+                                        <input type="hidden" name="Markdowntext" value="@markdown.MarkdownId" />
                                         <button class="btn btn-secondary btn-sm">Edit</button>
                                     </form>
                                    
                                     <button id="copy-btn" class="btn btn-secondary btn-sm">Copy to Clipboard</button>
-                                    <pre>@note.MarkdownText</pre>
+                                    <pre>@markdown.MarkdownText</pre>
                                     @* <span class="note-timestamp">@note.CreatedOn.ToString("g")</span> *@
                                 </div>
 
@@ -136,11 +136,11 @@
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h1 class="modal-title fs-5" id="githubModalLabel-@note.Id">Modal title</h1>
+                                                <h1 class="modal-title fs-5" id="githubModalLabel-@markdown.MarkdownId">Modal title</h1>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                @await Html.PartialAsync("_GithubCredentials", new GitHubInfo() { NoteId = @note.Id })
+                                                @await Html.PartialAsync("_GithubCredentials", new GitHubInfo() { MarkdownId = @markdown.MarkdownId })
                                             </div>
                                         </div>
                                     </div>
