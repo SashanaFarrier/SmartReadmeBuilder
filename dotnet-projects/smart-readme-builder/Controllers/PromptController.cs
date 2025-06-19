@@ -10,16 +10,24 @@ namespace SmartReadmeBuilder.Controllers
 {
     public class PromptController : Controller
     {
-        private readonly IMarkdownRepository _markdownReopsitory;
+        private readonly IMarkdownRepository _markdownRepository;
      
         public PromptController(IMarkdownRepository markdownRepository)
         {
-            _markdownReopsitory = markdownRepository;
+            _markdownRepository = markdownRepository;
         }
 
         public IActionResult Index()
         {
-            ViewBag.Prompts = _markdownReopsitory.GetAllPrompts().OrderByDescending(p => p.CreatedOn).ToList();
+            var prompts = _markdownRepository.GetAllPrompts().OrderByDescending(p => p.CreatedOn).ToList();
+            var markdowns = _markdownRepository.GetAllMarkdowns().OrderByDescending(m => m.CreatedOn).ToList();
+            Log log = new Log
+            {
+                Prompts = prompts,
+                Markdowns = markdowns
+            };
+
+            ViewBag.Log = log;
 
             return View();
         }
@@ -40,10 +48,18 @@ namespace SmartReadmeBuilder.Controllers
 
                 AIClient api = new AIClient();
                 var response = await api.GetResponseAsync(prompt.Text);
-                prompt.MarkdownText = response;
+
+                Markdown markdown = new Markdown
+                {
+                    Text = response,
+                    PromptId = prompt.Id
+                };
+
+                //prompt.MarkdownText = response;
                 
-                _markdownReopsitory.AddPrompt(prompt);
-                _markdownReopsitory.SaveChanges();
+                _markdownRepository.AddPrompt(prompt);
+                _markdownRepository.AddMarkdown(markdown);
+                _markdownRepository.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -57,18 +73,21 @@ namespace SmartReadmeBuilder.Controllers
         [HttpPost]
         public async Task<IActionResult> RegenerateMarkdown(Guid id)
         {
-            var existingPrompt = _markdownReopsitory.GetPromptById(id);
+            var existingPrompt = _markdownRepository.GetPromptById(id);
+            var existingMarkdown = _markdownRepository.GetAllMarkdowns().ToList()
+                .Find(m => m.PromptId == existingPrompt.Id);
 
-            if(existingPrompt is null) return NotFound("Prompt not found");
+            if (existingPrompt is null) return NotFound("Prompt not found");
 
             try
             {
                 AIClient api = new AIClient();
 
                 var response = await api.GetResponseAsync(existingPrompt.Text);
-                existingPrompt.MarkdownText = response;
+                
+                existingMarkdown.Text = response;
 
-                _markdownReopsitory.SaveChanges();
+                _markdownRepository.SaveChanges();
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -83,7 +102,7 @@ namespace SmartReadmeBuilder.Controllers
         public IActionResult EditPrompt(Guid id)
         {
 
-            var existingNote = _markdownReopsitory.GetPromptById(id);
+            var existingNote = _markdownRepository.GetPromptById(id);
 
             if (existingNote is null) return NotFound("Note not found");
 
@@ -93,7 +112,7 @@ namespace SmartReadmeBuilder.Controllers
         [HttpPost]
         public async Task<IActionResult> EditPrompt(Prompt prompt)
         {
-            var existingPrompt = _markdownReopsitory.GetAllPrompts().FirstOrDefault(p => p.Id == prompt.Id);
+            var existingPrompt = _markdownRepository.GetAllPrompts().FirstOrDefault(p => p.Id == prompt.Id);
 
             if (string.IsNullOrEmpty(prompt.Text)) return RedirectToAction("Index", new { error = "Prompt text cannot be empty." });
 
@@ -105,8 +124,8 @@ namespace SmartReadmeBuilder.Controllers
 
                 if (Regex.Replace(existingPrompt.Text, @"[\p{P}]+$", "") == Regex.Replace(prompt.Text, @"[\p{P}]+$", ""))
                 {
-                    _markdownReopsitory.UpdatePrompt(prompt);
-                    _markdownReopsitory.SaveChanges();
+                    _markdownRepository.UpdatePrompt(prompt);
+                    _markdownRepository.SaveChanges();
 
                     return RedirectToAction("Index");
 
@@ -116,11 +135,13 @@ namespace SmartReadmeBuilder.Controllers
                     {
 
                         AIClient api = new AIClient();
+                        var existingMarkdown = _markdownRepository.GetAllMarkdowns().ToList()
+                            .Find(m => m.PromptId == existingPrompt.Id);
                         var response = await api.GetResponseAsync(prompt.Text);
                         existingPrompt.Text = prompt.Text;
-                        existingPrompt.MarkdownText = response;
+                       existingMarkdown.Text = response;
 
-                        _markdownReopsitory.SaveChanges();
+                        _markdownRepository.SaveChanges();
 
                     }
                     catch (Exception ex)
@@ -141,8 +162,11 @@ namespace SmartReadmeBuilder.Controllers
         {
             try
             {
-                _markdownReopsitory.DeletePrompt(id);
-                _markdownReopsitory.SaveChanges();
+                var existingMarkdown = _markdownRepository.GetAllMarkdowns().ToList()
+                                        .Find(m => m.PromptId == id);
+                _markdownRepository.DeletePrompt(id);
+                _markdownRepository.DeleteMarkdown(existingMarkdown.Id);
+                _markdownRepository.SaveChanges();
 
                 TempData["DeleteSuccess"] = "Note deleted successfully.";
                 TempData["DeletedAt"] = DateTime.UtcNow;

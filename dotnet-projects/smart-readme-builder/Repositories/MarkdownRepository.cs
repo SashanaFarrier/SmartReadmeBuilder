@@ -8,59 +8,100 @@ namespace SmartReadmeBuilder.Repositories
     public class MarkdownRepository : IMarkdownRepository
     {
         private readonly IHttpContextAccessor _context;
-        private readonly List<Prompt> _prompts;
+        private readonly Log _log;
 
         public MarkdownRepository(IHttpContextAccessor context)
         {
             _context = context;
-            _prompts = GetPromptsFromSession();
+           _log = GetPromptsFromSession();
         }
 
-        private List<Prompt> GetPromptsFromSession()
+        private Log GetPromptsFromSession()
         {
-            var promptsJson = _context?.HttpContext?.Session.GetString("Prompts");
-            return string.IsNullOrEmpty(promptsJson) ? new List<Prompt>() : JsonSerializer.Deserialize<List<Prompt>>(promptsJson);
+            var sessionHistoryLog = _context?.HttpContext?.Session.GetString("Logs");
+            return string.IsNullOrEmpty(sessionHistoryLog) ? new Log() : JsonSerializer.Deserialize<Log>(sessionHistoryLog);
+        }
+
+        public Log GetLogs()
+        {
+            return _log; 
         }
 
         public IEnumerable<Prompt> GetAllPrompts()
         {
-            return _prompts;
+          return _log.Prompts;
+             
         }
+
+        public IEnumerable<Markdown> GetAllMarkdowns()
+        {
+            return _log.Markdowns;
+        }
+
 
         public Prompt GetPromptById(Guid id)
         {
-            return _prompts.FirstOrDefault(p => p.Id == id);
+            return _log.Prompts.FirstOrDefault(p => p.Id == id);
+
+        }
+
+        public Markdown GetMarkdownById(Guid id)
+        {
+            return _log.Markdowns?.FirstOrDefault(m => m.Id == id);
         }
 
         public void AddPrompt(Prompt prompt)
         {
-            _prompts.Add(prompt);
+            _log.Prompts.Add(prompt);
+        }
+
+        public void AddMarkdown(Markdown markdown)
+        {
+            _log.Markdowns.Add(markdown);
         }
 
         public void UpdatePrompt(Prompt prompt)
         {
-            var existingPrompt = _prompts?.FirstOrDefault(p => p.Id == prompt.Id);
+            var existingPrompt = _log.Prompts?.FirstOrDefault(p => p.Id == prompt.Id);
             if (existingPrompt != null)
             {
                 existingPrompt.Text = prompt.Text;
-                //existingPrompt.MarkdownText = prompt.MarkdownText;
-                //existingPrompt.CreatedOn = prompt.CreatedOn;
+            }
+        }
+
+        public void UpdateMarkdown(Markdown markdown)
+        {
+            var existingMarkdown = _log.Markdowns?.FirstOrDefault(p => p.Id == markdown.Id);
+
+            if (existingMarkdown != null) 
+            {
+                existingMarkdown.Text = markdown.Text;
             }
         }
 
         public void DeletePrompt(Guid id)
         {
-            var promptToRemove = _prompts?.FirstOrDefault(p => p.Id == id);
+            var promptToRemove = _log.Prompts?.FirstOrDefault(p => p.Id == id);
             if (promptToRemove != null)
             {
-                _prompts?.Remove(promptToRemove);
+                var markdownToRemove = _log.Markdowns?.FirstOrDefault(m => m.PromptId == id);
+                _log.Prompts?.Remove(promptToRemove);
+                _log.Markdowns?.Remove(markdownToRemove);
+            }
+        }
+
+        public void DeleteMarkdown(Guid id)
+        {
+            var markdownToRemove = _log.Markdowns?.FirstOrDefault(m => m.Id == id);
+            if (markdownToRemove != null)
+            {
+                _log.Markdowns?.Remove(markdownToRemove);
             }
         }
 
         public void SaveChanges()
         {
-           
-            _context?.HttpContext?.Session.SetString("Prompts", JsonSerializer.Serialize(_prompts));
+           _context.HttpContext.Session.SetString("Logs", JsonSerializer.Serialize(_log));
         }
     }
 }

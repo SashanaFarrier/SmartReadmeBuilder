@@ -5,12 +5,11 @@ namespace SmartReadmeBuilder.Models
     public class Prompt
     {
         public Guid Id { get; set; } = Guid.NewGuid();
-        public Guid MarkdownId { get; set; } = Guid.NewGuid();
         public DateTime CreatedOn { get; set; } = DateTime.Now;
 
         [Required(ErrorMessage = "This field is required. Please describe your app.")]
         public string Text { get; set; } = string.Empty;
-        public string MarkdownText { get; set; } = string.Empty;
+
 
         //public int Count { get; set; } = 0;
         //public int Words { get; set; } = 0;
@@ -57,4 +56,6 @@ namespace SmartReadmeBuilder.Models
         //    return Sentences;
         //}
     }
+
+
 }
