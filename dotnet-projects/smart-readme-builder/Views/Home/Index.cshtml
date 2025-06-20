@@ -8,7 +8,7 @@
 <div class="text-center">
     <h1 class="display-4">Smart README Builder</h1>
     <h2>Tell us about your application to get started.</h2>
-    <form asp-controller="Prompt" asp-action="CreatePrompt" method="post">
+    <form asp-controller="Log" asp-action="CreatePrompt" method="post">
         <div asp-validation-summary="ModelOnly" class=""></div>
         @* <label asp-for="Text"></label> *@
         <textarea asp-for="Text" id="textbox" rows="10" cols="100" placeholder="Describe your app to generate a readME..."></textarea>

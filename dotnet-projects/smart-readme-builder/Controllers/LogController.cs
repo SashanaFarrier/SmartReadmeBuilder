@@ -8,11 +8,11 @@ using System.Text.RegularExpressions;
 
 namespace SmartReadmeBuilder.Controllers
 {
-    public class PromptController : Controller
+    public class LogController : Controller
     {
         private readonly IMarkdownRepository _markdownRepository;
      
-        public PromptController(IMarkdownRepository markdownRepository)
+        public LogController(IMarkdownRepository markdownRepository)
         {
             _markdownRepository = markdownRepository;
         }
@@ -54,8 +54,6 @@ namespace SmartReadmeBuilder.Controllers
                     Text = response,
                     PromptId = prompt.Id
                 };
-
-                //prompt.MarkdownText = response;
                 
                 _markdownRepository.AddPrompt(prompt);
                 _markdownRepository.AddMarkdown(markdown);
@@ -66,7 +64,7 @@ namespace SmartReadmeBuilder.Controllers
                 prompt.Text = $"Error generating response from OpenAI: {ex.Message}";
             }
 
-            return RedirectToAction("Index", "Prompt");
+            return RedirectToAction("Index");
         }
 
 
@@ -88,7 +86,7 @@ namespace SmartReadmeBuilder.Controllers
                 existingMarkdown.Text = response;
 
                 _markdownRepository.SaveChanges();
-                return RedirectToAction("Index");
+                //return RedirectToAction("Index");
             }
             catch (Exception ex)
             {

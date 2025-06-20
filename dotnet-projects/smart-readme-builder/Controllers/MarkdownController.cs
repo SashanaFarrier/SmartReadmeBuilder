@@ -23,9 +23,6 @@ namespace SmartReadmeBuilder.Controllers
         [HttpGet]
         public IActionResult Edit(Guid id)
         {
-            //var prompts = _markdownRepository.GetAllPrompts().ToList();
-            //var existingMarkdown = prompts?.Find(m => m.MarkdownId.Equals(id));
-            //var existingMarkdown = _markdownRepository.GetPromptById(id);
             var existingMarkdown = _markdownRepository.GetMarkdownById(id);
 
             if (existingMarkdown is null)
@@ -33,17 +30,10 @@ namespace SmartReadmeBuilder.Controllers
                 return NotFound("Markdown not found");
             }
 
-            //MarkdownViewModel markdownViewModel = new MarkdownViewModel
-            //{
-            //    MarkdownText = existingMarkdown.MarkdownText
-            //};
-
             return View("~/Views/Markdown/Edit.cshtml", existingMarkdown);
         }
 
         [HttpPost]
-
-        //fix duplicate id
         public IActionResult Edit(Markdown markdown)
         {
 
@@ -53,9 +43,8 @@ namespace SmartReadmeBuilder.Controllers
             existingMarkdown.Text = markdown.Text;
             _markdownRepository.SaveChanges();
 
-                return RedirectToAction("Index", "Prompt");
-            
-            
+            return RedirectToAction("Index", "Log");
+
         }
 
         [HttpPost]
@@ -71,7 +60,7 @@ namespace SmartReadmeBuilder.Controllers
             if (markdown is null)
             {
                 TempData["PushError"] = "No markdown available to push to GitHub.";
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Log");
             }
 
                 var username = gitHubInfo.Username;
@@ -83,17 +72,14 @@ namespace SmartReadmeBuilder.Controllers
                 if (!await GitHubAPI.AddFileToRepository(username, repo, branch, commitMessage, githubToken, markdown.Text))
                 {
                     TempData["PushError"] = "Something went wrong. GitHub credentials could not be authenticated.";
-                    return RedirectToAction("Index");
+                    return RedirectToAction("Index", "Log");
                 }
 
                 GitHubAPI.AddFileToRepository(username, repo, branch, commitMessage, githubToken, markdown.Text);
 
                 TempData["PushSuccess"] = "Note pushed to GitHub successfully.";
-                //GitHubAPI.ConfigureRepo("SashanaFarrier", "test", "master", "Added readme");
-                //GitHubAPI.AddFileToRepository(note.MarkdownText).Wait();  
-            
 
-            return RedirectToAction("Index");
+                return RedirectToAction("Index", "Log");
         }
 
     }
