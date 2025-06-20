@@ -23,10 +23,12 @@ namespace SmartReadmeBuilder.Controllers
         [HttpGet]
         public IActionResult Edit(Guid id)
         {
-            var prompts = _markdownRepository.GetAllPrompts().ToList();
-            var existingMarkdown = prompts?.Find(m => m.MarkdownId.Equals(id));
+            //var prompts = _markdownRepository.GetAllPrompts().ToList();
+            //var existingMarkdown = prompts?.Find(m => m.MarkdownId.Equals(id));
+            //var existingMarkdown = _markdownRepository.GetPromptById(id);
+            var existingMarkdown = _markdownRepository.GetMarkdownById(id);
 
-            if(existingMarkdown is null)
+            if (existingMarkdown is null)
             {
                 return NotFound("Markdown not found");
             }
@@ -42,20 +44,18 @@ namespace SmartReadmeBuilder.Controllers
         [HttpPost]
 
         //fix duplicate id
-        public IActionResult Edit(Prompt prompt)
+        public IActionResult Edit(Markdown markdown)
         {
-            //var notesJson = HttpContext.Session.GetString("Notes") ?? "";
-            //var notes = string.IsNullOrEmpty(notesJson) ? new List<Note>() : JsonSerializer.Deserialize<List<Note>>(notesJson);
-            var prompts = _markdownRepository.GetAllPrompts().ToList();
-            var existingMarkdown = prompts?.Find(m => m.MarkdownId.Equals(prompt.MarkdownId));
-            if (existingMarkdown is not null)
-            {
-                existingMarkdown.MarkdownText = prompt.MarkdownText;
-                _markdownRepository.SaveChanges();
-                //HttpContext.Session.SetString("Notes", JsonSerializer.Serialize(notes));
-                return RedirectToAction("Index");
-            }
-            return NotFound("Markdown not found");
+
+            var existingMarkdown = _markdownRepository.GetMarkdownById(markdown.Id);
+            if(existingMarkdown is null) return NotFound("Markdown not found");
+
+            existingMarkdown.Text = markdown.Text;
+            _markdownRepository.SaveChanges();
+
+                return RedirectToAction("Index", "Prompt");
+            
+            
         }
 
         [HttpPost]
@@ -66,10 +66,7 @@ namespace SmartReadmeBuilder.Controllers
                 return View();
             }
 
-            //var notesJson = HttpContext.Session.GetString("Notes") ?? "";
-            //var notes = string.IsNullOrEmpty(notesJson) ? new List<Prompt>() : JsonSerializer.Deserialize<List<Prompt>>(notesJson);
-            var markdown = _markdownRepository.GetAllPrompts().ToList().Find(m => m.MarkdownId.Equals(gitHubInfo.MarkdownId));
-
+            var markdown = _markdownRepository.GetMarkdownById(gitHubInfo.MarkdownId);
 
             if (markdown is null)
             {
@@ -77,24 +74,19 @@ namespace SmartReadmeBuilder.Controllers
                 return RedirectToAction("Index");
             }
 
-            //var markdown = markdowns.Find(m => m.MarkdownId.Equals(gitHubInfo.MarkdownId)) ?? null;
-            //if (markdown is null) return NotFound("Note not found");
-
                 var username = gitHubInfo.Username;
                 var repo = gitHubInfo.Repo;
                 var branch = gitHubInfo.Branch;
                 var commitMessage = gitHubInfo.CommitMessage;
                 var githubToken = gitHubInfo.GithubToken;
 
-             
-
-                if (!await GitHubAPI.AddFileToRepository(username, repo, branch, commitMessage, githubToken, markdown.MarkdownText))
+                if (!await GitHubAPI.AddFileToRepository(username, repo, branch, commitMessage, githubToken, markdown.Text))
                 {
                     TempData["PushError"] = "Something went wrong. GitHub credentials could not be authenticated.";
                     return RedirectToAction("Index");
                 }
 
-                GitHubAPI.AddFileToRepository(username, repo, branch, commitMessage, githubToken, markdown.MarkdownText);
+                GitHubAPI.AddFileToRepository(username, repo, branch, commitMessage, githubToken, markdown.Text);
 
                 TempData["PushSuccess"] = "Note pushed to GitHub successfully.";
                 //GitHubAPI.ConfigureRepo("SashanaFarrier", "test", "master", "Added readme");
