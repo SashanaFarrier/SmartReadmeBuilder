@@ -47,12 +47,10 @@ namespace SmartReadmeBuilder.api
                     var createdTree = await client.Git.Tree.Create(owner, repoName, newtree);
 
                     var repo = await client.Repository.Get(owner, repoName);
-                    //var defaultBranch = repo.DefaultBranch;
 
                     var branchReference = await client.Git.Reference.Get(owner, repoName, "heads/" + branch);
 
                     var newCommit = new NewCommit(
-                      //"Added ReadMe",
                       commitMessage,
                       createdTree.Sha,
                       new[] { branchReference.Object.Sha });
@@ -61,8 +59,6 @@ namespace SmartReadmeBuilder.api
 
                     var updateReference = new ReferenceUpdate(createdCommit.Sha);
 
-                    //await client.Git.Reference.Update(owner, repoName, "heads/" + defaultBranch, updateReference);
-                    //await client.Repository.Content.GetAllContents(owner, repoName, "README.md");
                     await client.Git.Reference.Update(owner, repoName, "heads/" + branch, updateReference);
                     await client.Repository.Content.GetAllContents(owner, repoName, "README.md");
 
