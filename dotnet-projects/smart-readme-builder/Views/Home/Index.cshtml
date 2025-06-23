@@ -5,90 +5,20 @@
     ViewData["Title"] = "Smart README Builder";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Smart README Builder</h1>
-    <h2>Tell us about your application to get started.</h2>
-    <form asp-controller="Log" asp-action="CreatePrompt" method="post">
-        <div asp-validation-summary="ModelOnly" class=""></div>
-        @* <label asp-for="Text"></label> *@
-        <textarea asp-for="Text" id="textbox" rows="10" cols="100" placeholder="Describe your app to generate a readME..."></textarea>
-        <button type="submit" class="btn btn-primary mt-2">Create Markdown</button>
-        <span asp-validation-for="Text" class="text-danger"></span>
-    </form>
-    @* <div class="mt-3">
-        <h3>Analysis Results:</h3>
-        <div class="mt-3 | details">
-            <div class="detail">
-                <span id="totalCharacters">0</span>
-                <strong>Total Characters</strong>
-            </div>
-            <div class="detail">
-                <span id="totalWords" asp-for="Words">0</span>
-                <strong>Words Count</strong>
-            </div>
-            <div class="detail">
-                <span id="totalSentences">0</span>
-                <strong>Sentence Count</strong>
-            </div>
-        </div>
-    </div> *@
-   
-    @* @if(string.IsNullOrEmpty(Model.Text))
-    {
-        <div class="mt-3">
-            <h3>Analysis Results:</h3>
-            <div class="mt-3 | details">
-                <div class="detail">
-                    <span id="totalCharacters">0</span>
-                    <strong>Total Characters</strong>
-                </div>
-                <div class="detail">
-                    <span id="totalWords" asp-for="Words">@Model.Words</span>
-                    <strong>Words Count:</strong>
-                </div>
-                <div class="detail">
-                    <span id="totalSentences">@Model.Sentences</span>
-                    <strong>Sentence Count</strong>
-                </div>
-            </div>
-        </div>
-    }
-    else
-    {
-        <div class="mt-3">
-            <p>Please enter some text to analyze.</p>
-        </div>
-    } *@
-</div>
-
-@section Scripts {
-    <script>
-         const textInput = document.getElementById("textInput");
-         const charCount = document.getElementById("totalCharacters");
-         const wordCount = document.getElementById("totalWords");
-         const sentenceCount = document.getElementById("totalSentences");
-
-         function countWords(text) {
-            return text.trim().split(/\s+/).filter(word => word.length > 0).length;
-         }
-
-         function countSentences(text) {
-                return text.split(/[.!?]+/).filter(sentence => sentence.trim().length > 0).length;
-         }
-
-        function getCount() {
-            const text = textInput.value;
-            charCount.textContent = text.length;
-            wordCount.textContent = countWords(text);
-            sentenceCount.textContent = countSentences(text);
+<section id="generate-prompt">
+    <div class="container d-flex flex-column justify-content-center align-items-center h-100">
+            @* <h1 class="display-4">Smart README Builder</h1> *@
+        <h2 class="text-center mb-5">Write a prompt to generate your README file.</h2>
+        <form asp-controller="Log" asp-action="CreatePrompt" method="post">
+            <div asp-validation-summary="ModelOnly" class=""></div>
+            @* <label asp-for="Text"></label> *@
+            <textarea asp-for="Text" id="textbox" rows="10" cols="100" placeholder="e.g. Create a README for a Node.js app built with Express and MongoDB."></textarea>
+            <button type="submit" class="btn mt-4">Generate ReadMe</button>
+            <span asp-validation-for="Text" class="text-danger"></span>
+        </form>
            
-        }
+    </div>
+</section>
 
-        textInput.addEventListener("input", getCount);
 
-        getCount();
-    </script>
-       
 
-        
-}
