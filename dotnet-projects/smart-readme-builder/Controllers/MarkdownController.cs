@@ -77,7 +77,7 @@ namespace SmartReadmeBuilder.Controllers
 
                 GitHubAPI.AddFileToRepository(username, repo, branch, commitMessage, githubToken, markdown.Text);
 
-                TempData["PushSuccess"] = "Note pushed to GitHub successfully.";
+                TempData["PushSuccess"] = "Markdown file was successfully pushed to GitHub.";
 
                 return RedirectToAction("Index", "Log");
         }
