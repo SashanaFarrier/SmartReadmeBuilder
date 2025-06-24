@@ -100,11 +100,11 @@ namespace SmartReadmeBuilder.Controllers
         public IActionResult EditPrompt(Guid id)
         {
 
-            var existingNote = _markdownRepository.GetPromptById(id);
+            var existingPrompt = _markdownRepository.GetPromptById(id);
 
-            if (existingNote is null) return NotFound("Note not found");
+            if (existingPrompt is null) return NotFound("Prompt not found");
 
-            return View(existingNote);
+            return View(existingPrompt);
         }
 
         [HttpPost]
@@ -166,13 +166,13 @@ namespace SmartReadmeBuilder.Controllers
                 _markdownRepository.DeleteMarkdown(existingMarkdown.Id);
                 _markdownRepository.SaveChanges();
 
-                TempData["DeleteSuccess"] = "Note deleted successfully.";
+                TempData["DeleteSuccess"] = "Prompt deleted successfully.";
                 TempData["DeletedAt"] = DateTime.UtcNow;
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("DeleteError", $"Error deleting note: {ex.Message}");
+                ModelState.AddModelError("DeleteError", $"Error deleting prompt: {ex.Message}");
                 return RedirectToAction("Index");
             }
             

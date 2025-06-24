@@ -1,15 +1,19 @@
 ﻿@using SmartReadmeBuilder.ViewModels
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+
 @model Markdown;
 
-<form asp-controller="Markdown" asp-action="Edit" method="post">
-    <div asp-validation-summary="ModelOnly" class=""></div>
-    @* <label asp-for="Text"></label> *@
-    <input asp-for="Id" type="hidden" />
-    <label asp-for="Text" class="form-label">Edit Markdown</label>
-    <textarea asp-for="Text" id="textbox" rows="30" class="w-100" ></textarea>
-    <button type="submit" class="btn btn-primary mt-2">Save</button>
-    <span asp-validation-for="Text" class="text-danger"></span>
-</form>
+<section id="update-markdown">
+    <div class="container mt-5">
+        <form asp-controller="Markdown" asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class=""></div>
+            <div class="mb-3">
+                <input asp-for="Id" type="hidden" />
+                <label asp-for="Text" class="fw-bold fs-2 form-label mb-5">Edit Markdown</label>
+                <textarea asp-for="Text" id="textbox" rows="30" class="w-100"></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-outline mt-2">Update</button>
+            <span asp-validation-for="Text" class="text-danger"></span>
+        </form>
+    </div>
+</section>
