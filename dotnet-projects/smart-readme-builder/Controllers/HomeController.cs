@@ -1,7 +1,12 @@
-using System.Diagnostics;
-using SmartReadmeBuilder.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Octokit;
+using SmartReadmeBuilder.api;
+using SmartReadmeBuilder.Models;
+using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 
 namespace SmartReadmeBuilder.Controllers
@@ -9,30 +14,25 @@ namespace SmartReadmeBuilder.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        public HomeController(ILogger<HomeController> logger)
+        private readonly IHttpContextAccessor _context;
+        public HomeController(ILogger<HomeController> logger, IHttpContextAccessor context)
         {
             _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View();
         }
 
-        //[HttpPost]
-
-        //public IActionResult Index(Prompt model)
-        //{
-        //    Prompt prompt = new Prompt();
-        //    prompt.Text = model.Text ?? string.Empty;
-        //    return View(prompt);
-        //}
-
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public IActionResult Authorize()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return Challenge(new AuthenticationProperties
+            {
+                RedirectUri = "/Log" // or wherever you want to send the user after login
+            }, "GitHub");
         }
+
     }
 }

@@ -1,79 +1,76 @@
-﻿using Octokit;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http.HttpResults;
+//using Octokit;
 using SmartReadmeBuilder.Interfaces;
 using SmartReadmeBuilder.Models;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 
 
 namespace SmartReadmeBuilder.api
 {
     public class GithubClient_API : IGitHubRepoConfig
     {
-        public async Task<bool> AddFileToRepository(string owner, string repoName, string branch, string commitMessage, string token, string markdownText)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public GithubClient_API(IHttpContextAccessor context)
+        {
+            _httpContextAccessor = context;
+        }
+
+        public async Task<bool> AddFileToRepository(string repo, string branch, string commitMessage, string markdownText)
         {
 
-            bool isSuccess = false;
-
-            try
+            var client = new HttpClient();
+            var httpContext = _httpContextAccessor.HttpContext;
+            
+            if (httpContext == null)
             {
-                GitHubClient client = new GitHubClient(new ProductHeaderValue("SmartReadmeBuilder"));
-
-                var githubInfo = await client.Repository.Branch.Get(owner, repoName, branch);
-
-                var tokenAuth = new Credentials(token);
-                client.Credentials = tokenAuth;
-
-                var user = await client.User.Current();
-
-                isSuccess = true;
-
-                if (isSuccess)
-                {
-                    var newBlob = new NewBlob
-                    {
-                        Content = markdownText,
-                        Encoding = EncodingType.Utf8
-                    };
-
-                    var createdBlob = await client.Git.Blob.Create(owner, repoName, newBlob);
-
-                    var newtree = new NewTree();
-                    newtree.Tree.Add(new NewTreeItem
-                    {
-                        Path = "README.md",
-                        Mode = Octokit.FileMode.File,
-                        Type = TreeType.Blob,
-                        Sha = createdBlob.Sha
-                    });
-
-                    var createdTree = await client.Git.Tree.Create(owner, repoName, newtree);
-
-                    var repo = await client.Repository.Get(owner, repoName);
-
-                    var branchReference = await client.Git.Reference.Get(owner, repoName, "heads/" + branch);
-
-                    var newCommit = new NewCommit(
-                      commitMessage,
-                      createdTree.Sha,
-                      new[] { branchReference.Object.Sha });
-
-                    var createdCommit = await client.Git.Commit.Create(owner, repoName, newCommit);
-
-                    var updateReference = new ReferenceUpdate(createdCommit.Sha);
-
-                    await client.Git.Reference.Update(owner, repoName, "heads/" + branch, updateReference);
-                    await client.Repository.Content.GetAllContents(owner, repoName, "README.md");
-
-                }
-
+                throw new InvalidOperationException("HttpContext is not available.");
             }
-            catch(NotFoundException ex)
+            
+            var accessToken = await httpContext.GetTokenAsync("access_token");
+            var userInfo = await new GitHubUser().GetGitHubUserInfo(accessToken, client);
+
+            var getUrl = $"https://api.github.com/repos/{userInfo.Login}/{repo}/contents/README.md?ref={branch}";
+            var getResponse = await client.GetAsync(getUrl);
+
+            string sha = null;
+            if (getResponse.IsSuccessStatusCode)
             {
-                isSuccess = false;
-            } catch(AuthorizationException ex)
-            {
-                isSuccess = false;
+                var existingFile = JsonDocument.Parse(await getResponse.Content.ReadAsStringAsync());
+                sha = existingFile.RootElement.GetProperty("sha").GetString();
             }
 
-            return isSuccess;
+            // Step 2: Prepare the request body
+            var payload = new
+            {
+                message = commitMessage,
+                content = Convert.ToBase64String(Encoding.UTF8.GetBytes(markdownText)),
+                branch = branch,
+                sha = sha // include only if updating
+            };
+
+            var json = JsonSerializer.Serialize(payload);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            // Step 3: PUT the file
+            var putUrl = $"https://api.github.com/repos/{userInfo.Login}/{repo}/contents/README.md";
+            var putResponse = await client.PutAsync(putUrl, content);
+
+            if (putResponse.IsSuccessStatusCode)
+            {
+                //return Ok("README.md pushed successfully!");
+                return true;
+            }
+            else
+            {
+                var error = await putResponse.Content.ReadAsStringAsync();
+                //return StatusCode((int)putResponse.StatusCode, $"GitHub API error: {error}");
+
+                return false;
+            }
+
         }
     }
 }
