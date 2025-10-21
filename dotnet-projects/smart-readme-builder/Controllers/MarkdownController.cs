@@ -5,6 +5,7 @@ using SmartReadmeBuilder.api;
 using SmartReadmeBuilder.Models;
 using SmartReadmeBuilder.Repositories;
 using SmartReadmeBuilder.ViewModels;
+using System.Security.Cryptography;
 using System.Text.Json;
 
 namespace SmartReadmeBuilder.Controllers
@@ -12,11 +13,14 @@ namespace SmartReadmeBuilder.Controllers
     public class MarkdownController : Controller
     {
         private readonly IMarkdownRepository _markdownRepository;
+        private readonly IHttpContextAccessor _context;
+        private readonly GithubClient_API GitHubAPI;
 
-        GithubClient_API GitHubAPI = new GithubClient_API();
-        public MarkdownController(IMarkdownRepository markdownRepository)
+        public MarkdownController(IMarkdownRepository markdownRepository, IHttpContextAccessor context, GithubClient_API githubClient_API)
         {
             _markdownRepository = markdownRepository; 
+            _context = context;
+            GitHubAPI = githubClient_API;
         }
 
         
@@ -52,35 +56,33 @@ namespace SmartReadmeBuilder.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View();
+                return View("Index", "Log");
             }
 
             var markdown = _markdownRepository.GetMarkdownById(gitHubInfo.MarkdownId);
 
-            if (markdown is null)
-            {
-                TempData["PushError"] = "No markdown available to push to GitHub.";
-                return RedirectToAction("Index", "Log");
-            }
+                if (markdown is null)
+                {
+                    TempData["PushError"] = "No markdown available to push to GitHub.";
+                    return RedirectToAction("Index", "Log");
+                }
 
-                var username = gitHubInfo.Username;
                 var repo = gitHubInfo.Repo;
                 var branch = gitHubInfo.Branch;
                 var commitMessage = gitHubInfo.CommitMessage;
-                var githubToken = gitHubInfo.GithubToken;
 
-                if (!await GitHubAPI.AddFileToRepository(username, repo, branch, commitMessage, githubToken, markdown.Text))
+                if (!await GitHubAPI.AddFileToRepository(repo, branch, commitMessage, markdown.Text))
                 {
                     TempData["PushError"] = "Something went wrong. GitHub credentials could not be authenticated.";
                     return RedirectToAction("Index", "Log");
                 }
 
-                GitHubAPI.AddFileToRepository(username, repo, branch, commitMessage, githubToken, markdown.Text);
+                GitHubAPI.AddFileToRepository(repo, branch, commitMessage, markdown.Text);
 
                 TempData["PushSuccess"] = "Markdown file was successfully pushed to GitHub.";
 
-                return RedirectToAction("Index", "Log");
-        }
+            return RedirectToAction("Index", "Log");
 
+        }
     }
 }

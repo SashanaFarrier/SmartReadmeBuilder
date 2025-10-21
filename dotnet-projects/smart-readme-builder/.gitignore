@@ -1,0 +1,12 @@
+# Ignore environment variable files
+.env
+.env.local
+.env.*.local
+
+# Optional: ignore secrets or credentials
+*.secret
+*.key
+*.pem
+
+# Optional: ignore user-specific config
+*.user

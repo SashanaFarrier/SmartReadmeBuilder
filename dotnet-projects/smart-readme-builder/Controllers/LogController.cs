@@ -1,8 +1,10 @@
 ﻿using Esprima.Ast;
 using Microsoft.AspNetCore.Mvc;
+using Octokit;
 using SmartReadmeBuilder.api;
 using SmartReadmeBuilder.Models;
 using SmartReadmeBuilder.Repositories;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -11,16 +13,19 @@ namespace SmartReadmeBuilder.Controllers
     public class LogController : Controller
     {
         private readonly IMarkdownRepository _markdownRepository;
-     
-        public LogController(IMarkdownRepository markdownRepository)
+        private readonly IHttpContextAccessor _context;
+        public LogController(IMarkdownRepository markdownRepository, IHttpContextAccessor context)
         {
             _markdownRepository = markdownRepository;
+            _context = context;
         }
 
         public IActionResult Index()
         {
+
             var prompts = _markdownRepository.GetAllPrompts().OrderByDescending(p => p.CreatedOn).ToList();
             var markdowns = _markdownRepository.GetAllMarkdowns().OrderByDescending(m => m.CreatedOn).ToList();
+            
             Log log = new Log
             {
                 Prompts = prompts,

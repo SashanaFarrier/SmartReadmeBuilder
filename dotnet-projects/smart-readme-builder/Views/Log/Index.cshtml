@@ -6,6 +6,21 @@
 }
 
 @{
+    if (TempData["UserAuthorizedSuccess"] != null)
+    {
+        //var timeDeleted = DateTime.UtcNow - (DateTime)TempData["DeletedAt"];
+        var time = DateTime.UtcNow;
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto">@TempData["UserAuthorizedSuccess"]</strong>
+                    <small>@time seconds ago</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+
+            </div>
+        </div>
+    }
 
     if (TempData["DeleteSuccess"] != null)
     {
@@ -123,6 +138,12 @@
                     </ul>
                 </sidebar>
                 <div id="markdown-history">
+                    <div class="d-flex">
+                        <form asp-action="AuthorizeUser" asp-controller="Log" method="post">
+                            <button type="submit" class="btn btn-link fw-bold nav-link">Authorize GitHub</button>
+                        </form>
+                    </div>
+                    
                     <ul>
                         @foreach (var markdown in (List<Markdown>)ViewBag.Log.Markdowns)
                         {
@@ -146,7 +167,7 @@
                                 <div class="markdown">
                                     <pre>@markdown.Text</pre>
                                 </div>
-
+                                
                                 <div class="modal fade" id="@modalId" tabindex="-1" aria-labelledby="@modalId" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
