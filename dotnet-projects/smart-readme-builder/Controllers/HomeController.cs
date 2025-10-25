@@ -4,6 +4,7 @@ using Octokit;
 using SmartReadmeBuilder.api;
 using SmartReadmeBuilder.Models;
 using System.Diagnostics;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -23,6 +24,19 @@ namespace SmartReadmeBuilder.Controllers
 
         public async Task<IActionResult> Index()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                var username = User.Identity.Name; // GitHub login name
+                var claims = User.Claims.ToList(); // All available claims
+
+                // You can also extract specific claims like:
+                var githubId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var githubLogin = User.FindFirst(ClaimTypes.Name)?.Value;
+
+                TempData["GitHubLogin"] = true;
+                return View(); // or redirect to dashboard
+            }
+
             return View();
         }
 
