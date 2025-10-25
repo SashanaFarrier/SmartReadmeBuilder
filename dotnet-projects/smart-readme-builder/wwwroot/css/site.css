@@ -19,7 +19,7 @@ body {
 }
 
 main {
-    min-height: 70vh;
+    min-height: 100vh;
 }
 
 ul, li {
@@ -46,6 +46,19 @@ header {
     border: 1px solid var(--tertiary-color);
     border-radius: .25vw;
 }
+
+.nav-link.btn-outline {
+    background-color: transparent;
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+}
+
+.nav-link.btn-outline:hover {
+    background-color: var(--tertiary-color);
+    color: var(--secondary-color);
+    border: 1px solid var(--accent-color);
+}
+
 
 textarea {
     color: #fff;
@@ -102,6 +115,12 @@ button {
     color: var(--accent-color);
 }
 
+
+.btn.pushBtn,
+.btn.update {
+    background-color: var(--primary-color);
+}
+
 /* popups */
 
 .toast,
@@ -124,14 +143,20 @@ button {
     cursor: help;
 }
 
+#generate-prompt {
+    display: grid;
+    height: 80vh;
+}
+
 #generate-prompt form {
     max-width: 80%;
     margin-inline: auto;
 }
 
 #generate-prompt h2 {
-    font-size: clamp(1.25rem, 1rem + 2vw, 3rem);
+    font-size: clamp(1.25rem, 1rem + 2vw, 2rem);
     max-width: 25ch;
+    margin-top: 0px;
 }
 
 #generate-prompt form {

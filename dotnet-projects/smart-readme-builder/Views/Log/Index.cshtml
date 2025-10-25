@@ -70,6 +70,15 @@
 
 }
 
+@if (TempData["GitHubLogin"] != null)
+{
+    <div class="alert alert-info text-center mb-5 w-50 mx-auto">
+        <p class="mb-0">You're already connected to GitHub as <strong>@User.Identity.Name</strong>.  <a class="" asp-area="" asp-controller="Log" asp-action="DisconnectGitHub">Manage GitHub access</a></p>
+       
+        @* <a href="https://github.com/settings/applications" target="_blank">Manage GitHub access</a> *@
+    </div>
+}
+
 <section id="log" class="container-fluid">
     @if (ViewBag.Log.Prompts.Count == 0)
     {
@@ -138,11 +147,14 @@
                     </ul>
                 </sidebar>
                 <div id="markdown-history">
-                    <div class="d-flex">
-                        <form asp-action="AuthorizeUser" asp-controller="Log" method="post">
-                            <button type="submit" class="btn btn-link fw-bold nav-link">Authorize GitHub</button>
-                        </form>
-                    </div>
+                    @if (TempData["GitHubLogin"] == null)
+                    {
+                        <div class="d-flex">
+                            <form asp-action="AuthorizeUser" asp-controller="Log" method="post">
+                                <button type="submit" class="btn btn-link fw-bold">Authorize GitHub</button>
+                            </form>
+                        </div>
+                    }
                     
                     <ul>
                         @foreach (var markdown in (List<Markdown>)ViewBag.Log.Markdowns)
@@ -161,13 +173,16 @@
                                         </form>
                                         <button id="@markdown.Id" class="copy-btn"><i class="bi bi-clipboard"></i></button>
                                         <!-- Button trigger modal -->
-                                        <button class="btn btn-secondary btn-sm btn-outline ms-auto | pushBtn" data-bs-toggle="modal" data-bs-target="#@modalId">Push to Github</button>
+                                        @* <button class="btn btn-secondary btn-sm btn-outline ms-auto | pushBtn" data-bs-toggle="modal" data-bs-target="#@modalId">Push to Github</button> *@
+                                        <button id="@markdown.Id" class="download-btn"><i class="bi bi-download"></i></button>
                                     </div>
                                 </div>
                                 <div class="markdown">
                                     <pre>@markdown.Text</pre>
                                 </div>
-                                
+                                <!-- Button trigger modal -->
+                                <button class="btn btn-sm ms-auto | pushBtn" data-bs-toggle="modal" data-bs-target="#@modalId">Push to Github</button>
+                                <!-- Modal -->
                                 <div class="modal fade" id="@modalId" tabindex="-1" aria-labelledby="@modalId" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">

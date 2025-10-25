@@ -1,9 +1,12 @@
 ﻿using Esprima.Ast;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Octokit;
 using SmartReadmeBuilder.api;
 using SmartReadmeBuilder.Models;
 using SmartReadmeBuilder.Repositories;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -34,8 +37,34 @@ namespace SmartReadmeBuilder.Controllers
 
             ViewBag.Log = log;
 
+            if (User.Identity.IsAuthenticated)
+            {
+                var username = User.Identity.Name; // GitHub login name
+                var claims = User.Claims.ToList(); // All available claims
+
+                // You can also extract specific claims like:
+                var githubId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var githubLogin = User.FindFirst(ClaimTypes.Name)?.Value;
+
+                TempData["GitHubLogin"] = true;
+                return View(); // or redirect to dashboard
+            }
+
+
             return View();
         }
+
+        //[HttpPost]
+        public async Task<IActionResult> DisconnectGitHub()
+        {
+            await HttpContext.SignOutAsync(); // Clears the auth cookie
+            HttpContext.Session.Clear();      // Optional: clears session data
+
+            return Redirect("https://github.com/settings/applications");
+
+            //return RedirectToAction("Index", "Log"); // Redirect to a confirmation page
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> CreatePrompt(Prompt prompt)

@@ -7,7 +7,15 @@
 
 <section id="generate-prompt">
     <div class="container d-flex flex-column justify-content-center align-items-center h-100">
-        <h2 class="text-center my-5">Write a prompt to generate your README file.</h2>
+        @if (TempData["GitHubLogin"] != null)
+        {
+            <div class="alert alert-info text-center w-50 mx-auto">
+                <p class="mb-0">You're already connected to GitHub as <strong>@User.Identity.Name</strong>. <a class="" asp-area="" asp-controller="Log" asp-action="DisconnectGitHub">Manage GitHub access</a></p>
+                
+                @* <a href="https://github.com/settings/applications" target="_blank">Manage GitHub access</a> *@
+            </div>
+        }
+        <h2 class="text-center mb-5">Generate your ReadMe.</h2>
         <form asp-controller="Log" asp-action="CreatePrompt" method="post">
             <div asp-validation-summary="ModelOnly" class=""></div>
             <textarea asp-for="Text" id="textbox" rows="10" cols="100" placeholder="e.g. Create a README for a Node.js app built with Express and MongoDB."></textarea>

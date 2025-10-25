@@ -12,7 +12,11 @@
                 <textarea asp-for="Text" id="textbox" rows="30" class="w-100"></textarea>
             </div>
             
-            <button type="submit" class="btn btn-outline mt-2">Update</button>
+            <div class="d-flex justify-content-between align-items-start">
+                <a class="btn btn-outline asp-area="" asp-action="Index" asp-controller="Log">Cancel</a>
+                <button type="submit" class="btn update mt-2">Update</button>
+            </div>
+           
             <span asp-validation-for="Text" class="text-danger"></span>
         </form>
     </div>
