@@ -28,7 +28,7 @@ namespace SmartReadmeBuilder.api
             {
                 throw new InvalidOperationException("HttpContext is not available.");
             }
-            
+
             var accessToken = await httpContext.GetTokenAsync("access_token");
             var userInfo = await new GitHubUser().GetGitHubUserInfo(accessToken, client);
 

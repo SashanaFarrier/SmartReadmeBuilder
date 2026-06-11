@@ -9,8 +9,8 @@
     <div class="container d-flex flex-column justify-content-center align-items-center h-100">
         @if (TempData["GitHubLogin"] != null)
         {
-            <div class="alert alert-info text-center w-50 mx-auto">
-                <p class="mb-0">You're already connected to GitHub as <strong>@User.Identity.Name</strong>. <a class="" asp-area="" asp-controller="Log" asp-action="DisconnectGitHub">Manage GitHub access</a></p>
+            <div class="alert text-center w-50 mx-auto">
+                @* <p class="mb-0">You are connected to GitHub as <strong>@User.Identity.Name</strong>. <a class="" asp-area="" asp-controller="Log" asp-action="DisconnectGitHub">Manage GitHub access</a></p> *@
                 
                 @* <a href="https://github.com/settings/applications" target="_blank">Manage GitHub access</a> *@
             </div>
@@ -20,11 +20,60 @@
             <div asp-validation-summary="ModelOnly" class=""></div>
             <textarea asp-for="Text" id="textbox" rows="10" cols="100" placeholder="e.g. Create a README for a Node.js app built with Express and MongoDB."></textarea>
             <button type="submit" class="btn btn-outline mt-4">Generate ReadMe</button>
-            <span asp-validation-for="Text" class="text-danger"></span>
+            <span asp-validation-for="Text" class="text-danger text-center mt-2"></span>
         </form>
+          
+        @if (TempData["API_Error"] != null)
+        {
+            <div class="toast-container position-fixed bg-secondary bottom-0 end-0 p-3 my-5">
+                <div id="liveToast" role="alert" aria-live="assertive" aria-atomic="true" class="toast text-black bg-danger border-0" data-bs-autohide="false">
+                    <div class="toast-header justify-content-between">
+                        <small id="timeAgo">Just now</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        <p class="mb-0">
+                            @TempData["API_Error"]
+                        </p>
+                    </div>
+                </div>
+            </div>
            
+        }
     </div>
 </section>
+@section Scripts {
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            var toastEl = document.querySelector('.toast');
+            if (toastEl) {
+                var toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            }
+
+            //tooltip
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+            //toast display timer
+            const popupShownAt = new Date();
+
+            const updateTimeAgo = () => {
+                const minutes = Math.floor((Date.now() - popupShownAt.getTime()) / 60000);
+                
+                if(toastEl) {
+                    document.getElementById("timeAgo").textContent = minutes === 1 ? `${minutes} min ago` : `${minutes} mins ago`;
+                    
+                } 
+            }
+            
+        // Update every minute
+        setInterval(updateTimeAgo, 60000);
+        });
+
+    </script> 
+
+}
 
 
 
