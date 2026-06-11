@@ -72,8 +72,8 @@
 
 @if (TempData["GitHubLogin"] != null)
 {
-    <div class="alert alert-info text-center mb-5 w-50 mx-auto">
-        <p class="mb-0">You're already connected to GitHub as <strong>@User.Identity.Name</strong>.  <a class="" asp-area="" asp-controller="Log" asp-action="DisconnectGitHub">Manage GitHub access</a></p>
+    <div class="alert text-center mb-5 w-50 mx-auto">
+        <p class="mb-0">Hey, <strong>@User?.Identity?.Name</strong>! You're currently connected to your GitHub account.  <a class="" asp-area="" asp-controller="Log" asp-action="DisconnectGitHub" target="_blank">Manage GitHub access</a></p>
        
         @* <a href="https://github.com/settings/applications" target="_blank">Manage GitHub access</a> *@
     </div>
@@ -83,9 +83,11 @@
     @if (ViewBag.Log.Prompts.Count == 0)
     {
         <div class="d-flex justify-content-center ">
-            <div class="alert alert-info" role="alert">
+            <p>No prompts found.</p>
+            <a asp-area="" asp-controller="Home" asp-action="Index">Create a prompt</a>
+            @* <div class="alert alert-info" role="alert">
                 <p>No prompts found. Please create a prompt to generate a README.</p>
-            </div>
+            </div> *@
         </div>
     }
     <div class="mt-3 h-100">

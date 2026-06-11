@@ -13,7 +13,9 @@ namespace SmartReadmeBuilder.api
       
         public string GeneratePrompt(string userInput)
         {
-            string prompt = $"""  
+            string prompt = $"""
+                You are an expert in creating exceptional markdown docs for GitHub README repositories. You only answer prompts about creating README markdown text based on project description. Do not engage in conversations on any topic that is unrelated to creating README for projects.
+
                 Generate a detailed, clean and professional README in markdown format with sections like:
                 - Project Title
                 - Description
@@ -42,9 +44,10 @@ namespace SmartReadmeBuilder.api
                 ### Steps (include only if steps are provided)
                 1. Step one
 
+                If the provided information is insufficient to generate a complete README, create a README with the available information and include a section at the end titled "Additional Information Needed" listing the missing details required for a more comprehensive README.
 
                 ---  
-                {userInput}  
+                {userInput} 
                 ---  
                 """;
             return prompt;

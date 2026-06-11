@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using SmartReadmeBuilder.api;
 using SmartReadmeBuilder.Models;
 using SmartReadmeBuilder.Repositories;
+using SmartReadmeBuilder.Services;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
@@ -26,6 +27,9 @@ Env.Load("./.env"); // Load environment variables from .env file
 builder.Services.AddHttpContextAccessor(); // Add HttpContextAccessor to access HttpContext in repositories
 builder.Services.AddScoped<IMarkdownRepository, MarkdownRepository>();
 builder.Services.AddScoped<GithubClient_API, GithubClient_API>();
+builder.Services.AddScoped<MarkdownService, MarkdownService>();
+builder.Services.AddScoped<LogService, LogService>();
+builder.Services.AddScoped<HttpContextAuthenticationService, HttpContextAuthenticationService>();
 
 //github oauth app credentials
 builder.Services.AddAuthentication(options =>
@@ -45,6 +49,7 @@ builder.Services.AddAuthentication(options =>
     options.UserInformationEndpoint = "https://api.github.com/user";
 
     options.Scope.Add("repo"); // Add scopes as needed
+ 
     options.SaveTokens = true;
 
     options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
@@ -95,5 +100,10 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+//app.MapGet("/login", async context =>
+//{
+//    await context.ChallengeAsync("GitHub", new AuthenticationProperties { RedirectUri = "/" });
+//});
 
 app.Run();
