@@ -1,6 +1,6 @@
 ﻿using SmartReadmeBuilder.Models;
 
-namespace SmartReadmeBuilder.Repositories
+namespace SmartReadmeBuilder.Interfaces
 {
     public interface IMarkdownRepository
     {

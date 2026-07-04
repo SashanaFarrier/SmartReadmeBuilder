@@ -25,7 +25,6 @@ namespace SmartReadmeBuilder.Models
         
         public async Task<GitHubUser> GetGitHubUserInfo(string accessToken, HttpClient client)
         {
-            //var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             client.DefaultRequestHeaders.UserAgent.ParseAdd("SmartReadMEBuilder");
 

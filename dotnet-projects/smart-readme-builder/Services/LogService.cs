@@ -1,5 +1,6 @@
 ﻿//using Octokit;
 using SmartReadmeBuilder.api;
+using SmartReadmeBuilder.Interfaces;
 using SmartReadmeBuilder.Models;
 using SmartReadmeBuilder.Repositories;
 using System.Security.Claims;
@@ -8,28 +9,18 @@ using System.Text.RegularExpressions;
 
 namespace SmartReadmeBuilder.Services
 {
-    public class LogService
+    public class LogService : ILogService
     {
+        private readonly AIClient _aiClient;
         private readonly IMarkdownRepository _markdownRepository;
         private readonly IHttpContextAccessor _context;
 
-        public LogService(IMarkdownRepository markdownRepository, IHttpContextAccessor context)
+        public LogService(AIClient aiClient, IMarkdownRepository markdownRepository, IHttpContextAccessor context)
         {
+            _aiClient = aiClient;
             _markdownRepository = markdownRepository;
             _context = context;
         }
-
-        //public bool IsUserAuthenticated()
-        //{
-        //    //var user = _context.HttpContext?.User;
-        //    //var username = user?.Identity?.Name; // GitHub login name
-        //    //var claims = user?.Claims.ToList(); // All available claims
-
-        //    //// You can also extract specific claims like:
-        //    //var githubId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        //    //var githubLogin = user?.FindFirst(ClaimTypes.Name)?.Value;
-        //    return _context.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
-        //}
         public Log GetSessionLogHistory()
         {
             var prompts = _markdownRepository.GetAllPrompts().OrderByDescending(p => p.CreatedOn).ToList();
@@ -47,9 +38,7 @@ namespace SmartReadmeBuilder.Services
         {
             try
             {
-
-                AIClient api = new AIClient();
-                var response = await api.GetResponseAsync(prompt.Text);
+                var response = await _aiClient.GetResponseAsync(prompt.Text);
 
                 Markdown markdown = new Markdown
                 {
@@ -82,9 +71,7 @@ namespace SmartReadmeBuilder.Services
 
                 try
                 {
-                    AIClient api = new AIClient();
-
-                    var response = await api.GetResponseAsync(existingPrompt.Text);
+                    var response = await _aiClient.GetResponseAsync(existingPrompt.Text);
 
                     existingMarkdown.Text = response;
 
@@ -118,12 +105,10 @@ namespace SmartReadmeBuilder.Services
                 
             try
             {
-                AIClient api = new AIClient();
-                
                 var existingMarkdown = _markdownRepository.GetAllMarkdowns().ToList()
                         .Find(m => m.PromptId == existingPrompt.Id);
                 
-                var response = await api.GetResponseAsync(prompt.Text);
+                var response = await _aiClient.GetResponseAsync(prompt.Text);
                     existingPrompt.Text = prompt.Text;
                     existingMarkdown.Text = response;
 
@@ -134,14 +119,7 @@ namespace SmartReadmeBuilder.Services
             {
                 ex.Message.ToString();
             }
-                //check if closing punctuation in the form text and prompt text are the only diferences
-
-                //if (Regex.Replace(existingPrompt.Text, @"[\p{P}]+$", "") == Regex.Replace(prompt.Text, @"[\p{P}]+$", ""))
-                //{
-                //    _markdownRepository.UpdatePrompt(prompt);
-                //    _markdownRepository.SaveChanges();
-                //}
-
+                
             return existingPrompt;
 
         }

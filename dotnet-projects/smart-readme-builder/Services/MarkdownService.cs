@@ -1,10 +1,10 @@
 ﻿using SmartReadmeBuilder.api;
+using SmartReadmeBuilder.Interfaces;
 using SmartReadmeBuilder.Models;
-using SmartReadmeBuilder.Repositories;
 
 namespace SmartReadmeBuilder.Services
 {
-    public class MarkdownService
+    public class MarkdownService: IMarkdownService
     {
         private readonly IMarkdownRepository _markdownRepository;
         private readonly GithubClient_API _githubClient;
@@ -28,7 +28,6 @@ namespace SmartReadmeBuilder.Services
                 _markdownRepository.SaveChanges();
             }
         }
-
         public async Task<bool> PushMarkdownToRepo(Guid markdownId, string repo, string branch, string commitMessage)
         {
             var markdown = _markdownRepository.GetMarkdownById(markdownId);

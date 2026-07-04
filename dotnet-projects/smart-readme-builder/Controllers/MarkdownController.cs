@@ -26,14 +26,7 @@ namespace SmartReadmeBuilder.Controllers
             _markdownService = markdownService;
             _authService = authService;
         }
-        //public MarkdownController(IMarkdownRepository markdownRepository, IHttpContextAccessor context, GithubClient_API githubClient_API)
-        //{
-        //    _markdownRepository = markdownRepository; 
-        //    _context = context;
-        //    GitHubAPI = githubClient_API;
-        //}
-
-
+        
         [HttpGet]
         public IActionResult Edit(Guid id)
         {

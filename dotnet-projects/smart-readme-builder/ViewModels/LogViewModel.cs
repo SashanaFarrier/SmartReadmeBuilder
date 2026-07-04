@@ -8,13 +8,4 @@ namespace SmartReadmeBuilder.ViewModels
         public List<Markdown> Markdowns { get; set; } = new List<Markdown>();
     }
 
-    //public List<Prompt> GetPrompts()
-    //    {
-    //        Prompt prompt = new Prompt
-    //        {
-
-    //        }
-    //    }
-
-    
 }
