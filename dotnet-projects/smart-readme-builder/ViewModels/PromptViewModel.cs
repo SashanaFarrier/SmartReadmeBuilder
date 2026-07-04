@@ -8,6 +8,4 @@ namespace SmartReadmeBuilder.ViewModels
         public DateTime CreatedOn { get; set; }
 
     }
-
-    
 }

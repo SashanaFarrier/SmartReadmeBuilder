@@ -70,7 +70,6 @@ namespace SmartReadmeBuilder.api
 
                 return false;
             }
-
         }
     }
 }

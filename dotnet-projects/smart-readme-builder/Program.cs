@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using SmartReadmeBuilder.api;
+using SmartReadmeBuilder.Interfaces;
 using SmartReadmeBuilder.Models;
 using SmartReadmeBuilder.Repositories;
 using SmartReadmeBuilder.Services;
@@ -24,13 +25,16 @@ builder.Services.AddSession(options =>
 
 Env.Load("./.env"); // Load environment variables from .env file
 
+builder.Configuration.SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
 builder.Services.AddHttpContextAccessor(); // Add HttpContextAccessor to access HttpContext in repositories
 builder.Services.AddScoped<IMarkdownRepository, MarkdownRepository>();
 builder.Services.AddScoped<GithubClient_API, GithubClient_API>();
 builder.Services.AddScoped<MarkdownService, MarkdownService>();
 builder.Services.AddScoped<LogService, LogService>();
 builder.Services.AddScoped<HttpContextAuthenticationService, HttpContextAuthenticationService>();
-
+builder.Services.AddSingleton<GetPromptInstructionsService, GetPromptInstructionsService>();
+builder.Services.AddScoped<AIClient, AIClient>();
 //github oauth app credentials
 builder.Services.AddAuthentication(options =>
 {
@@ -74,8 +78,6 @@ builder.Services.AddAuthentication(options =>
 //builder.Services.AddHttpContextAccessor(); // Add HttpContextAccessor to access HttpContext in repositories
 //builder.Services.AddScoped<IMarkdownRepository, MarkdownRepository>(); 
 //builder.Services.AddScoped<GitHubUser>(); 
-
-
 
 var app = builder.Build();
 
