@@ -283,6 +283,74 @@ button {
     align-self: flex-end;
 }
 
+/*Log page*/
+#log-container .log-container__top-content {
+    /*    color: var(--secondary-color);*/
+    padding: 1.5rem;
+    margin-top: 5rem;
+    width: 80%;
+    max-width: 600px;
+    background: #170A1C;
+    background: linear-gradient(40deg, rgba(23, 10, 28, 1) 0%, rgba(156, 149, 220, 0.25) 68%);
+    border-radius: .5vw;
+    border: 1px solid var(--accent-color);
+}
+
+#log-container .welcome-msg p > strong {
+    color: transparent;
+    background-image: linear-gradient(77deg, rgb(134 70 159) 0%, rgba(193, 154, 183, 1) 82%);
+    -webkit-background-clip: text;
+}
+
+#log-container .welcome-msg a {
+   color: var(--accent-color);
+   text-decoration: none;
+}
+
+#log-container .welcome-msg a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent-color);
+}
+
+#log-container p + p {
+    color: var(--tertiary-color);
+}
+
+#log-container .svg-file-icon {
+    margin-inline: auto;
+}
+
+#log-container .empty-prompt-msg span {
+    width: 180px;
+    height: 1px;
+    background-color: var(--secondary-color);
+    background: linear-gradient(90deg, rgba(193, 154, 183, .25) 0%, rgba(23, 10, 28, .25) 82%);
+}
+
+#log-container .empty-prompt-msg .stars {
+    width: 28px;
+    margin-top: -15px;
+}
+
+#log-container .create-prompt-btn {
+    background-color: var(--primary-color);
+}
+
+#log-container .btn:hover {
+   
+    /*border: none;*/
+}
+
+#log-container .empty-prompt-msg > img {
+    max-width: 60px;
+}
+
+#log-container .create-prompt-btn:hover > svg {
+    fill: var(--accent-color);
+}
+
+
+
 footer {
     padding-block: 2rem;
 }
