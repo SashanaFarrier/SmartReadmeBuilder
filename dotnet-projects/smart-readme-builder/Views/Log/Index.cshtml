@@ -70,26 +70,51 @@
 
 }
 
-@if (TempData["GitHubLogin"] != null)
-{
-    <div class="alert text-center mb-5 w-50 mx-auto">
-        <p class="mb-0">Hey, <strong>@User?.Identity?.Name</strong>! You're currently connected to your GitHub account.  <a class="" asp-area="" asp-controller="Log" asp-action="DisconnectGitHub" target="_blank">Manage GitHub access</a></p>
-       
-        @* <a href="https://github.com/settings/applications" target="_blank">Manage GitHub access</a> *@
-    </div>
-}
+<section id="log-container" class="">
+    <div class="container text-center | log-container__top-content">
+        <div class="svg-file-icon">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 640 640">
+                <path d="M192 112L304 112L304 200C304 239.8 336.2 272 376 272L464 272L464 512C464 520.8 456.8 528 448 528L192 528C183.2 528 176 520.8 176 512L176 128C176 119.2 183.2 112 192 112zM352 131.9L444.1 224L376 224C362.7 224 352 213.3 352 200L352 131.9zM192 64C156.7 64 128 92.7 128 128L128 512C128 547.3 156.7 576 192 576L448 576C483.3 576 512 547.3 512 512L512 250.5C512 233.5 505.3 217.2 493.3 205.2L370.7 82.7C358.7 70.7 342.5 64 325.5 64L192 64zM248 320C234.7 320 224 330.7 224 344C224 357.3 234.7 368 248 368L392 368C405.3 368 416 357.3 416 344C416 330.7 405.3 320 392 320L248 320zM248 416C234.7 416 224 426.7 224 440C224 453.3 234.7 464 248 464L392 464C405.3 464 416 453.3 416 440C416 426.7 405.3 416 392 416L248 416z" />
 
-<section id="log" class="container-fluid">
-    @if (ViewBag.Log.Prompts.Count == 0)
-    {
-        <div class="d-flex justify-content-center ">
-            <p>No prompts found.</p>
-            <a asp-area="" asp-controller="Home" asp-action="Index">Create a prompt</a>
-            @* <div class="alert alert-info" role="alert">
+
+            </svg>
+        </div>
+        @if (TempData["GitHubLogin"] != null)
+        {
+            <div class="alert mb-3 | welcome-msg">
+                <p class="fs-4">Welcome back, <strong>@User?.Identity?.Name</strong>! 👋 </p>
+                <p>You're currently connected to your GitHub account.</p>
+                @* <a href="https://github.com/settings/applications" target="_blank">Manage GitHub access</a> *@
+                <a class="fw-bold fs-6" asp-area="" asp-controller="Log" asp-action="DisconnectGitHub" target="_blank">
+                    Manage GitHub access
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="14" height="20" fill="#C19AB7"><!--!Font Awesome Free v7.3.0 by fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M439.1 297.4C451.6 309.9 451.6 330.2 439.1 342.7L279.1 502.7C266.6 515.2 246.3 515.2 233.8 502.7C221.3 490.2 221.3 469.9 233.8 457.4L371.2 320L233.9 182.6C221.4 170.1 221.4 149.8 233.9 137.3C246.4 124.8 266.7 124.8 279.2 137.3L439.2 297.3z" /></svg>
+                </a>
+            </div>
+        }
+        @if (ViewBag.Log.Prompts.Count == 0)
+        {
+            <div class="empty-prompt-msg">
+                <div class="d-flex justify-content-between px-5 mb-5">
+                    <span></span>
+                    <img src="~/assets/shining.png" class="stars" />
+                    <span></span>
+                </div>
+                <img src="~/assets/folder.png" />
+                @* <img src="~/assets/add-icon.png" /> *@
+                <p class="fw-bold fs-5 mt-3">No readME found.</p>
+                <p>Create your first prompt to get started.</p>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="mt-3 | btn create-prompt-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="16" height="16" fill="#ffffff"><!--!Font Awesome Free v7.3.0 by fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M352 128C352 110.3 337.7 96 320 96C302.3 96 288 110.3 288 128L288 288L128 288C110.3 288 96 302.3 96 320C96 337.7 110.3 352 128 352L288 352L288 512C288 529.7 302.3 544 320 544C337.7 544 352 529.7 352 512L352 352L512 352C529.7 352 544 337.7 544 320C544 302.3 529.7 288 512 288L352 288L352 128z" /></svg>
+                    Create a prompt
+                </a>
+                @* <div class="alert alert-info" role="alert">
                 <p>No prompts found. Please create a prompt to generate a README.</p>
             </div> *@
-        </div>
-    }
+            </div>
+        }
+    </div>
+    
     <div class="mt-3 h-100">
         <div class="d-flex justify-content-between gap-5 flex-column flex-lg-row">
 
