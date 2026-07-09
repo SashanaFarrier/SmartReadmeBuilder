@@ -236,6 +236,7 @@ button {
 #prompt-history,
 #markdown-history {
     padding: 1.5rem;
+    background-color: #241629;
     overflow-y: auto;
     border: 1px solid var(--accent-color);
     border-radius: .5vw;
@@ -252,12 +253,15 @@ button {
 
 
 #markdown-history .markdown {
-    padding: 1rem;
+    padding: 2rem;
+    margin-block: 2rem;
+    background-color: #2b212f;
+    border-radius: .5vw;
 }
 
 #prompt-history li,
 #markdown-history li {
-    padding: 2rem;
+/*    padding: 2rem;*/
     margin-bottom: 2rem;
     background-color: transparent;
     border-radius: .5vw;
@@ -284,7 +288,31 @@ button {
 }
 
 /*Log page*/
-#log-container .log-container__top-content {
+
+#log-container {
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+#log-container .log-container__content {
+/*    max-width: 1400px;*/
+    background-color: #241629;
+     border: 1px solid var(--accent-color);
+    border-radius: .5vw;
+}
+
+#log-container .log-container__content > img {
+    max-width: 120px;
+}
+
+#log-container .log-container__content > .connection-alert {
+    padding: 1rem 2rem;
+/*    background-color: #2b212f;*/
+background-color: #100514;
+    border-radius: .5rem;
+}
+
+#log-container .log-container__content-empty {
     /*    color: var(--secondary-color);*/
     padding: 1.5rem;
     margin-top: 5rem;
@@ -316,7 +344,11 @@ button {
     color: var(--tertiary-color);
 }
 
-#log-container .svg-file-icon {
+#log-container .log-container__content .svg-file-icon {
+/*    margin: 0;*/
+}
+
+#log-container .log-container__content-empty .svg-file-icon {
     margin-inline: auto;
 }
 
