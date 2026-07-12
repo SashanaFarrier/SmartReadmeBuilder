@@ -152,15 +152,12 @@
 
                     </svg>
                 </div>
-               
             </div>
         </div>
     }
 
-    
     <div class="mt-3 h-100">
         <div class="d-flex justify-content-between gap-5 flex-column flex-lg-row">
-
             @if (ViewBag.Log.Prompts != null && ViewBag.Log.Prompts.Count > 0)
             {
                 <sidebar id="prompt-history" class="col-lg-4">
@@ -262,9 +259,15 @@
                                 <div class="modal fade" id="@modalId" tabindex="-1" aria-labelledby="@modalId" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h1 class="modal-title fs-5" id="githubModalLabel-@markdown.Id">Push ReadME to GitHub</h1>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            <div class="modal-header border-0">
+                                                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-header__content | d-flex align-items-center gap-2">
+                                                <img src="~/assets/github-svgrepo-com.svg" alt="GitHub Logo" class="github-logo" />
+                                                <div>
+                                                    <h3 class="modal-title fs-5" id="githubModalLabel-@markdown.Id">Push to GitHub</h3>
+                                                    <p class="m-0">Push your README directly to a GitHub repository.</p>
+                                                </div>
                                             </div>
                                             <div class="modal-body">
                                                 @await Html.PartialAsync("_GithubCredentials", new GitHubInfo() { MarkdownId = @markdown.Id })
